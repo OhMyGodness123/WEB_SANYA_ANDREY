@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" href="/static/styles/styles.css">
+    <title>{{ title }}</title>
 </head>
-<body>
-
+<body class="mainstyle">
+    <div>
+        <nav>
+            <a href="http://127.0.0.1:5000/" style="margin-left: 100px"><img src="/static/img/start_pacman2.0.png"></a>
+            <a class="nav_bar" href="http://127.0.0.1:5000/market">Маркет</a>
+            <a class="nav_bar" href="http://127.0.0.1:5000/forum">форум</a>
+        </nav>
+    </div>
+    {% block content %}{% endblock %}
 </body>
 </html>
