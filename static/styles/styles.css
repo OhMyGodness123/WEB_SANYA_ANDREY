@@ -1,0 +1,8 @@
+.mainstyle {
+    background-color: #2b2b2b;
+}
+a.nav_bar {
+    font: 16px/26px "Arial", sans-serif;
+    color: green;
+    text-decoration:none;
+}
