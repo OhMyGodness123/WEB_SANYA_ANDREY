@@ -2,17 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/styles/styles.css">
-    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles/styles.css" type="text/css">
+    <title>Todoroki</title>
 </head>
-<body class="mainstyle">
-    <div>
-        <nav>
-            <a href="http://127.0.0.1:5000/" style="margin-left: 100px"><img src="/static/img/start_pacman2.0.png"></a>
-            <a class="nav_bar" href="http://127.0.0.1:5000/market">Маркет</a>
-            <a class="nav_bar" href="http://127.0.0.1:5000/forum">форум</a>
-        </nav>
-    </div>
-    {% block content %}{% endblock %}
+<body>
+    <header>
+        <div class="container">
+            <img src="static/img/logo.png" alt="logo" class="logo">
+            <nav>
+                <ul>
+                    <li><a href="/forum">Главная</a></li>
+                    <li><a href="/market">Маркет</a></li>
+                    <li><a href="#">ВК</a></li>
+                    <li><a href="#">Telegram</a></li>
+                    {% if 1 == 1 %}
+                       <li><a href="/logout" class="navbar-brand"></a></li>
+                    {% else %}
+                        <li><a class="btn btn-success" href="/register">Зарегистрироваться</a></li>
+                        <li><a class="btn btn-primary" href="/login">Войти</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% block content %}
+        {% endblock %}
+    </header>
 </body>
 </html>
