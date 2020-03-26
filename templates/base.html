@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles/styles.css" type="text/css">
     <title>Todoroki</title>
@@ -9,19 +10,12 @@
 <body>
     <header>
         <div class="container">
-            <img src="static/img/logo.png" alt="logo" class="logo">
+            <a href="/"><img src="static/img/logo.png" alt="logo" class="logo"></a>
             <nav>
                 <ul>
-                    <li><a href="/forum">Главная</a></li>
                     <li><a href="/market">Маркет</a></li>
-                    <li><a href="#">ВК</a></li>
-                    <li><a href="#">Telegram</a></li>
-                    {% if 1 == 1 %}
-                       <li><a href="/logout" class="navbar-brand"></a></li>
-                    {% else %}
-                        <li><a class="btn btn-success" href="/register">Зарегистрироваться</a></li>
-                        <li><a class="btn btn-primary" href="/login">Войти</a></li>
-                    {% endif %}
+                    <li><a href="#"><i class="fa fa-vk" aria-hidden="true" style="font-size: 40px;"></i></a></li>
+                    <li><a href="#"><i class="fa fa-telegram" aria-hidden="true" style="font-size: 40px;"></i></a></li>
                 </ul>
             </nav>
         </div>
@@ -30,3 +24,4 @@
     </header>
 </body>
 </html>
+

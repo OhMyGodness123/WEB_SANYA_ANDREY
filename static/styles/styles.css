@@ -2,7 +2,7 @@ body {
     margin: 0;
     background-color: #1b2f42;
     font-family: 'Open Sans', sans-serif;
-    font-weight: 50px;
+    font-weight: 80px;
 }
 
 .container {
@@ -13,14 +13,14 @@ body {
 .logo {
     float: left;
     height: 40px;
-    padding-top: 15px;
+    padding-top: 27px;
 }
 
 header {
     background-color: #0f3b65;
     display: table;
     width: 100%;
-    height: 70px
+    height: 90px
 }
 
 nav {
@@ -35,7 +35,7 @@ nav ul {
 
 nav li {
     display: inline-block;
-    margin: left 50px;
+    margin-left: 100px;
     padding-top: 25px;
 
 }
@@ -44,5 +44,6 @@ nav a {
     color: #05f;
     text-decoration: none;
     text-transform: uppercase;
-    font-size: 22px;
+    font-size: 30px;
+    font-weight: bold
 }
