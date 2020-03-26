@@ -6,22 +6,29 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles/styles.css" type="text/css">
     <title>Todoroki</title>
+    <link rel="shortcut icon" href="static/img/logo2.png" type="image/png">
 </head>
 <body>
     <header>
         <div class="container">
             <a href="/"><img src="static/img/logo.png" alt="logo" class="logo"></a>
+            <a href="/market" class="market">Маркет</a>
             <nav>
                 <ul>
-                    <li><a href="/market">Маркет</a></li>
                     <li><a href="#"><i class="fa fa-vk" aria-hidden="true" style="font-size: 40px;"></i></a></li>
                     <li><a href="#"><i class="fa fa-telegram" aria-hidden="true" style="font-size: 40px;"></i></a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="/exit"><i class="fa fa-sign-out" aria-hidden="true" style="font-size: 40px;"></i></a></li>
+                    {% else %}
+                        <li><a href="/enter">Вход</a></li>
+                        <li><a href="/register">Регистрация</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
     </header>
-    {% block content %}
-    {% endblock %}
+{% block content %}
+{% endblock %}
 </body>
 </html>
 
