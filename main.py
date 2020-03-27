@@ -66,7 +66,8 @@ def add_news():
         sessions.merge(current_user)
         sessions.commit()
         return redirect('/')
-    return render_template('news.html', title='Добавление новости', form=form)
+    return render_template('add_news.html', title='Добавление новости', form=form,
+                           nickname=current_user.nickname, image=current_user.avatar)
 
 
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
@@ -109,7 +110,8 @@ def edit_news(id):
             return redirect('/')
         else:
             abort(404)
-    return render_template('news.html', title='Редактирование новости', form=form)
+    return render_template('add_news.html', title='Редактирование новости', form=form,
+                           nickname=current_user.nickname, image=current_user.avatar)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -130,10 +132,8 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
     form = RegisterForm()
-    print(1)
     if form.validate_on_submit():
         file = request.files['file']
-        print(1)
         path = app.config['UPLOAD_FOLDER'] + file.filename
         old_file = file.filename
         file.save(path)
@@ -148,7 +148,8 @@ def reqister():
                                    message="Такой пользователь уже есть")
         user = users.User(
             nickname=form.name.data,
-            email=form.email.data
+            email=form.email.data,
+            avatar=path
         )
         user.set_password(form.password.data)
         session.add(user)
