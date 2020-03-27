@@ -17,8 +17,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     date_of_registration = sqlalchemy.Column(sqlalchemy.String, default=datetime.datetime.now().date())
     root = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     img = random.choice(
-        ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg', 'avatar4.jpg', 'avatar5.jpg', 'avatar6.jpg',
-         'avatar7.jpg'])
+        ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', 'avatar5.png', 'avatar6.png',
+         'avatar7.png'])
     avatar = sqlalchemy.Column(sqlalchemy.String, default=f'/static/img/{img}')
 
     def set_password(self, password):

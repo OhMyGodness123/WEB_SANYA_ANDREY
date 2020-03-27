@@ -151,7 +151,9 @@ def reqister():
 
 @app.route("/")
 def index():
-    return render_template('base.html', title='Todoroki')
+    session = db_session.create_session()
+    new = session.query(news.News).all()
+    return render_template('forum.html', title='Todoroki', news=new)
 
 
 @app.route("/forum")
@@ -165,8 +167,8 @@ def market():
 
 
 def main():
-    db_session.global_init("db/database.sqlite")
-    app.run(port=5214, host='127.0.0.1')
+    db_session.global_init("db/blogs.sqlite")
+    app.run(port=5111, host='127.0.0.1')
 
 
 if __name__ == '__main__':

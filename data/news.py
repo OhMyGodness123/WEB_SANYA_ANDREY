@@ -9,6 +9,7 @@ import datetime
 class News(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'news'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True)
+    color = sqlalchemy.Column(sqlalchemy.String)
     title = sqlalchemy.Column(sqlalchemy.String)
     text = sqlalchemy.Column(sqlalchemy.String)
     creator = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey("users.id"))
