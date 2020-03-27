@@ -57,3 +57,34 @@ nav a {
     font-weight: bold;
     padding-left: 100px;
 }
+
+
+.themes {
+    background: #000000;
+    float: left;
+    font-size: 19px;
+    width: 15%;
+    height: 280px;
+    margin-left: 190px;
+    margin-top: 40px;
+    border-radius: 14px;
+    padding-left: 20px;
+    padding-top: 60px;
+}
+
+.contentss {
+    background: #000000;
+    font-size: 19px;
+    width: 73%;
+    height: 280px;
+    margin-left: 310px;
+    margin-top: 40px;
+    border-radius: 14px;
+    padding-left: 170px;
+    padding-top: 60px;
+}
+
+.titles {
+    padding-left: 50%;
+    color: #bb0ae0;
+}

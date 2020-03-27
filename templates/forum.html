@@ -1,5 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1> ФОРУМ</h1>
+    <div class="themes">
+        <ul>
+            <a href="#"><li>Новости</li></a>
+            <a href="#"><li>Софт</li></a>
+            <a href="#"><li>Халява</li></a>
+            <a href="#"><li>Обсуждение игр</li></a>
+        </ul>
+    </div>
+
+    <div class="contentss">
+    {% for item in news%}
+        {% set idd = item.id %}
+        {% set hr = '/news/' ~ idd %}
+        <a href={{hr}}><div style="background-color: #ffa500;">
+            <h2 class="titles">{{item.title}}</h2>
+            <div>
+                {{item.content}}
+            </div>
+            <div style="margin-left: 30px; color: black;">
+                Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
+            </div>
+        </div></a>
+        {% endfor %}
+    </div>
 {% endblock %}

@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 import random
+import datetime
 
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
@@ -13,7 +14,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     nickname = sqlalchemy.Column(sqlalchemy.String, unique=True)
     email = sqlalchemy.Column(sqlalchemy.String)
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
-    date_of_registration = sqlalchemy.Column(sqlalchemy.String)
+    date_of_registration = sqlalchemy.Column(sqlalchemy.String, default=datetime.datetime.now().date())
     root = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     img = random.choice(
         ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg', 'avatar4.jpg', 'avatar5.jpg', 'avatar6.jpg',
