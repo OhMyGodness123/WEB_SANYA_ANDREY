@@ -3,7 +3,9 @@
 {% block content %}
     <div class="themes">
         <ul>
-            <a href="make_news"><button type="button" class="btn btn-outline-success" style="margin-bottom: 30px;">Создать тему</button></a>
+            {% if current_user.is_authenticated %}
+                <a href="make_news"><button type="button" class="btn btn-outline-success" style="margin-bottom: 30px;">Создать тему</button></a>
+            {% endif %}
             <li><a href="#">Новости</a></li>
             <li><a href="#">Софт</a></li>
             <li><a href="#">Халява</a></li>
@@ -14,14 +16,14 @@
     <div class="contentss">
     {% for item in news %}
         {% set idd = item.id %}
-        {% set stylee = "padding-left:" ~ 50 + "%;" +  "color:#" ~ item.color + ";" %}
+        {% set stylee = "padding-left:" ~ 45 + "%;" +  "color:#" ~ item.color + ";" %}
         {% set hr = '/news/' ~ idd %}
-        <a href={{hr}}><div style="background-color: #ffa500;">
+        <a href={{hr}}><div class="rainbowborder">
             <h2 style={{stylee}}>{{item.title}}</h2>
             <div>
                 {{item.content}}
             </div>
-            <div style="margin-left: 30px; color: black;">
+            <div style="margin-left: 30px; color: white; ">
                 Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
             </div>
         </div></a>

@@ -68,23 +68,27 @@ nav a {
     margin-left: 190px;
     margin-top: 40px;
     border-radius: 14px;
-    padding-left: 20px;
+    padding-left: 10px;
     padding-top: 60px;
 }
 
 .contentss {
     background: #000000;
     font-size: 19px;
-    width: 73%;
-    height: 280px;
-    margin-left: 310px;
+    width: 68%;
+    margin-left: 410px;
     margin-top: 40px;
     border-radius: 14px;
-    padding-left: 170px;
+    padding-left: 100px;
+    padding-right: 45px;
     padding-top: 60px;
+    padding-bottom: 60px;
 }
 
-.titles {
-    padding-left: 50%;
-    color: #bb0ae0;
+.rainbowborder {
+   background-color: #0b0810;
+  border: 3px solid transparent;
+  border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
+  border-image-slice: 1;
+  margin-bottom: 20px;
 }
