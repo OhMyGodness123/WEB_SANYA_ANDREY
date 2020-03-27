@@ -27,7 +27,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     name = StringField('Имя пользователя', validators=[DataRequired()])
-    submit = SubmitField('Войти')
+    submit = SubmitField('Зарегистрироваться')
 
 
 class LoginForm(FlaskForm):
@@ -151,9 +151,12 @@ def reqister():
 
 @app.route("/")
 def index():
-    session = db_session.create_session()
-    newss = session.query(news.News)
-    return render_template('forum.html', title='Todoroki', news=newss)
+    return render_template('base.html', title='Todoroki')
+
+
+@app.route("/forum")
+def forum():
+    return render_template('forum.html', title='Todoroki | Форум')
 
 
 @app.route('/market')
@@ -162,8 +165,8 @@ def market():
 
 
 def main():
-    db_session.global_init("db/blogs.sqlite")
-    app.run(port=131, host='127.0.0.1')
+    db_session.global_init("db/database.sqlite")
+    app.run(port=5214, host='127.0.0.1')
 
 
 if __name__ == '__main__':
