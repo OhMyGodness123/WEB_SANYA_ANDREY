@@ -148,8 +148,7 @@ def reqister():
                                    message="Такой пользователь уже есть")
         user = users.User(
             nickname=form.name.data,
-            email=form.email.data,
-            avatar=path
+            email=form.email.data
         )
         user.set_password(form.password.data)
         session.add(user)
@@ -160,15 +159,13 @@ def reqister():
 
 @app.route("/")
 def index():
+    session = db_session.create_session()
+    new = session.query(news.News).all()
+    (new).reverse()
     if current_user.is_authenticated:
-        return render_template('base.html', title='Todoroki', nickname=current_user.nickname,
-                               image=current_user.avatar)
-    return render_template('base.html', title='Todoroki')
-
-
-@app.route("/forum")
-def forum():
-    return render_template('forum.html', title='Todoroki | Форум')
+        return render_template('forum.html', title='Todoroki', nickname=current_user.nickname,
+                               image=current_user.avatar, news=new)
+    return render_template('forum.html', title='Todoroki', news=new)
 
 
 @app.route('/market')
