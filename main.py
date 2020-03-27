@@ -166,7 +166,7 @@ def market():
 
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=2222, host='127.0.0.1')
+    app.run(port=2111, host='127.0.0.1')
 
 
 if __name__ == '__main__':

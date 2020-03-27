@@ -12,8 +12,9 @@ body {
 
 .logo {
     float: left;
-    height: 40px;
-    padding-top: 27px;
+    height: 70px;
+    padding-top: 30px;
+    padding-left: 60px;
 }
 
 header {
@@ -31,6 +32,7 @@ nav ul {
     margin: 0;
     padding: 10;
     list-style: none;
+    padding-right: 140px;
 }
 
 nav li {
