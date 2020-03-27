@@ -9,6 +9,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+UPLOAD_FOLDER = 'static/img/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @login_manager.user_loader
@@ -128,7 +130,13 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
     form = RegisterForm()
+    print(1)
     if form.validate_on_submit():
+        file = request.files['file']
+        print(1)
+        path = app.config['UPLOAD_FOLDER'] + file.filename
+        old_file = file.filename
+        file.save(path)
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -151,9 +159,10 @@ def reqister():
 
 @app.route("/")
 def index():
-    session = db_session.create_session()
-    new = session.query(news.News).all()
-    return render_template('forum.html', title='Todoroki', news=new)
+    if current_user.is_authenticated:
+        return render_template('base.html', title='Todoroki', nickname=current_user.nickname,
+                               image=current_user.avatar)
+    return render_template('base.html', title='Todoroki')
 
 
 @app.route("/forum")
@@ -163,12 +172,13 @@ def forum():
 
 @app.route('/market')
 def market():
-    return render_template('market.html', title='Todoroki | Маркет')
+    return render_template('market.html', title='Todoroki | Маркет', nickname=current_user.nickname,
+                           image=current_user.avatar)
 
 
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=5111, host='127.0.0.1')
+    app.run(port=1231, host='127.0.0.1')
 
 
 if __name__ == '__main__':

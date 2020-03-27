@@ -9,7 +9,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/styles/styles.css" type="text/css">
-    <link rel="stylesheet" href="/static/styles/rainbow.css" type="text/css">
 
     <title>Todoroki</title>
     <link rel="shortcut icon" href="static/img/logo2.png" type="image/png">
@@ -24,16 +23,16 @@
                     <li><a href="#"><i class="fa fa-vk" aria-hidden="true" style="font-size: 40px; text-decoration: none;"></i></a></li>
                     <li><a href="#"><i class="fa fa-telegram" aria-hidden="true" style="font-size: 40px; text-decoration: none;"></i></a></li>
                     {% if current_user.is_authenticated %}
-                        <a href="/logout"><button type="button" class="btn btn-outline-danger" style="margin-left: 50px; margin-right: 90px; margin-bottom: 13px;">
-                            Выход
-                        </button></a>
+                    <li><a href="/logout"><p>{{ nickname }}<img src={{ image }} style="width: 50px"></p></a></li>
                     {% else %}
-                        <a href="/login"><button type="button" class="btn btn-outline-primary" style="margin-left: 80px; margin-right: 30px; margin-bottom: 13px;">
-                            Вход
+                        <a href="/login"><button type="button" class="btn btn-outline-primary" href="/login">
+                          Вход
                         </button></a>
-                        <a href="/register"><button type="button" class="btn btn-outline-info" style="margin-left: 0px; margin-right: 90px; margin-bottom: 13px;">
-                            Регистрация
-                        </button></a>
+
+                    <a href="/register"><button type="button" class="btn btn-outline-success">
+                          Регистрация
+                    </button>
+                    </a>
                     {% endif %}
                 </ul>
             </nav>
