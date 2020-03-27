@@ -23,7 +23,7 @@
                     <li><a href="#"><i class="fa fa-vk" aria-hidden="true" style="font-size: 40px; text-decoration: none;"></i></a></li>
                     <li><a href="#"><i class="fa fa-telegram" aria-hidden="true" style="font-size: 40px; text-decoration: none;"></i></a></li>
                     {% if current_user.is_authenticated %}
-                        <li><a href="/exit"><i class="fa fa-sign-out" aria-hidden="true" style="font-size: 40px; text-decoration: none;"></i></a></li>
+                        <li><a href="/logout"><i class="fa fa-sign-out" aria-hidden="true" style="font-size: 40px; text-decoration: none;"></i></a></li>
                     {% else %}
                         <a href="/login"><button type="button" class="btn btn-outline-primary" href="/login">
                           Вход

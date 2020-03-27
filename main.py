@@ -27,7 +27,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     name = StringField('Имя пользователя', validators=[DataRequired()])
-    submit = SubmitField('Войти')
+    submit = SubmitField('Зарегистрироваться')
 
 
 class LoginForm(FlaskForm):
@@ -165,8 +165,8 @@ def market():
 
 
 def main():
-    db_session.global_init("db/blogs.sqlite")
-    app.run(port=6565, host='127.0.0.1')
+    db_session.global_init("db/database.sqlite")
+    app.run(port=5214, host='127.0.0.1')
 
 
 if __name__ == '__main__':
