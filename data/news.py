@@ -12,7 +12,7 @@ class News(SqlAlchemyBase, UserMixin, SerializerMixin):
     color = sqlalchemy.Column(sqlalchemy.String)
     title = sqlalchemy.Column(sqlalchemy.String)
     text = sqlalchemy.Column(sqlalchemy.String)
-    creator = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey("users.id"))
+    creator = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     date_of_create = sqlalchemy.Column(sqlalchemy.String,  default=datetime.datetime.now().date())
     category = sqlalchemy.Column(sqlalchemy.String)
     user = orm.relation('User')

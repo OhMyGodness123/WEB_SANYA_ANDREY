@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user, log
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired
 from data import db_session, news, users
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -133,10 +134,14 @@ def login():
 def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
-        file = request.files['file']
-        path = app.config['UPLOAD_FOLDER'] + file.filename
-        old_file = file.filename
-        file.save(path)
+        try:
+            file = request.files['file']
+            path = app.config['UPLOAD_FOLDER'] + file.filename
+            file.save(path)
+        except PermissionError:
+            img = random.choice(['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png',
+                                 'avatar5.png', 'avatar6.png', 'avatar7.png'])
+            path = f"static/img/{img}"
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -148,7 +153,8 @@ def reqister():
                                    message="Такой пользователь уже есть")
         user = users.User(
             nickname=form.name.data,
-            email=form.email.data
+            email=form.email.data,
+            avatar=path
         )
         user.set_password(form.password.data)
         session.add(user)
