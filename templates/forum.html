@@ -16,15 +16,20 @@
     <div class="contentss">
     {% for item in news %}
         {% set idd = item.id %}
-        {% set stylee = "padding-left:" ~ 45 + "%;" +  "color:#" ~ item.color + ";" %}
+        {% set stylee = "padding-left:" ~ 40 + "%;" +  "color:#" ~ item.color + ";" %}
         {% set hr = '/news/' ~ idd %}
+        {% set hr2 = '/news_delete/' ~ idd %}
         <a href={{hr}}><div class="rainbowborder">
             <h2 style={{stylee}}>{{item.title}}</h2>
             <div>
                 {{item.content}}
             </div>
-            <div style="margin-left: 30px; color: white; ">
-                Автор - {{item.user.nickname}}, Дата написания - {{item.date_of_create}}
+            <div style="margin-left: 30px; color: white;">
+                Автор - {{item.user.name}}, Дата написания - {{item.created_date}}
+                {% if current_user.is_authenticated and (current_user.root == True or current_user == item.user) %}
+                    <a href={{hr2}}><button type="button" class="btn btn-outline-danger" style="margin-left: 600px; margin-bottom: 10px;">Удалить</button></a>
+                    <a href={{hr}}><button type="button" class="btn btn-outline-warning" style="margin-bottom: 10px;">Редактировать</button></a>
+                {% endif %}
             </div>
         </div></a>
         {% endfor %}

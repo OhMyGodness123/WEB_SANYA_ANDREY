@@ -7,7 +7,7 @@
   animation: rainbow 20s ease infinite;
   font-size: 40px;
   line-height: 75px;
-  padding-left: 10px;
+  padding-left: 20px;
 }
 
 @-webkit-keyframes rainbow {
