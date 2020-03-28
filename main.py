@@ -41,8 +41,8 @@ class LoginForm(FlaskForm):
 
 class NewsForm(FlaskForm):
     title = StringField('Заголовок', validators=[DataRequired()])
-    content = TextAreaField('Содержание')
-    is_private = BooleanField('Приватность')
+    text = TextAreaField('Содержание')
+    color = StringField('Цвет новости: #')
     submit = SubmitField('Применить')
 
 
@@ -60,8 +60,9 @@ def add_news():
         sessions = db_session.create_session()
         new = news.News()
         new.title = form.title.data
-        new.content = form.content.data
-        new.is_private = form.is_private.data
+        new.text = form.text.data
+        new.creator = current_user.nickname
+        new.color = form.color.data
         current_user.news.append(new)
         sessions.merge(current_user)
         sessions.commit()
@@ -94,8 +95,8 @@ def edit_news(id):
                                                news.News.user == current_user).first()
         if new:
             form.title.data = new.title
-            form.content.data = new.content
-            form.is_private.data = new.is_private
+            form.text.data = new.text
+            form.color.data = new.color
         else:
             abort(404)
     if form.validate_on_submit():
@@ -104,8 +105,8 @@ def edit_news(id):
                                                news.News.user == current_user).first()
         if new:
             new.title = form.title.data
-            new.content = form.content.data
-            new.is_private = form.is_private.data
+            new.text = form.text.data
+            new.color = form.color.data
             sessions.commit()
             return redirect('/')
         else:
@@ -148,7 +149,8 @@ def reqister():
                                    message="Такой пользователь уже есть")
         user = users.User(
             nickname=form.name.data,
-            email=form.email.data
+            email=form.email.data,
+            avatar=path
         )
         user.set_password(form.password.data)
         session.add(user)
@@ -176,7 +178,7 @@ def market():
 
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=1231, host='127.0.0.1')
+    app.run(port=1412, host='127.0.0.1')
 
 
 if __name__ == '__main__':
