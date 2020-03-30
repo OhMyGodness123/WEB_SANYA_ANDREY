@@ -14,22 +14,22 @@
     </div>
 
     <div class="contentss">
+        <h1 style="text-align:center;" class="login-text rainbow-animated">Интересное</h1>
     {% for item in news %}
         {% set idd = item.id %}
-        {% set stylee = "padding-left:" ~ 40 + "%;" +  "color:#" ~ item.color + ";" %}
+        {% set stylee = "text-align:center;" + "color:#" ~ item.color + ";" %}
         {% set hr = '/news/' ~ idd %}
         {% set hr2 = '/news_delete/' ~ idd %}
-        <a href={{hr}}><div class="rainbowborder">
+        <a href={{hr}} style="color: white; text-decoration: none;"><div class="rainbowborder">
+             {% if current_user.is_authenticated and (current_user.root == True or current_user == item.user) %}
+            <a href={{hr2}}><i class="fa fa-trash-o" aria-hidden="true" style="color: red; font-size: 30px; padding-left: 10px; padding-top: 5px;"></i></a>
+            <a href={{hr}}><i class="fa fa-pencil" aria-hidden="true" style="font-size: 30px;padding-left: 93%;"></i></a>
+               {% endif %}
             <h2 style={{stylee}}>{{item.title}}</h2>
-            <div>
-                {{item.content}}
-            </div>
             <div style="margin-left: 30px; color: white;">
-                Автор - {{item.user.nickname}}, Дата написания - {{item.date_of_create}}
-                {% if current_user.is_authenticated and (current_user.root == True or current_user == item.user) %}
-                    <a href={{hr2}}><button type="button" class="btn btn-outline-danger" style="margin-left: 600px; margin-bottom: 10px;">Удалить</button></a>
-                    <a href={{hr}}><button type="button" class="btn btn-outline-warning" style="margin-bottom: 10px;">Редактировать</button></a>
-                {% endif %}
+
+                Автор - {{item.user.nickname}}, <br>
+                Дата написания - {{item.date_of_create}}
             </div>
         </div></a>
         {% endfor %}
