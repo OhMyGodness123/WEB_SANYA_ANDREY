@@ -1,7 +1,8 @@
 from flask import Flask, render_template, redirect, request, make_response, session, abort, jsonify
 from flask_wtf import FlaskForm
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField, \
+    SelectField
 from wtforms.validators import DataRequired
 from data import db_session, news, users
 import random
@@ -44,6 +45,9 @@ class NewsForm(FlaskForm):
     title = StringField('Заголовок', validators=[DataRequired()])
     text = TextAreaField('Содержание')
     color = StringField('Цвет новости: #')
+    category = SelectField('Категория',
+                           choices=[('Новости', 'Новости'), ('Софт', 'Софт'), ('Халява', 'Халява'),
+                                    ('Обсуждение игр', 'Обсуждение игр')])
     submit = SubmitField('Применить')
 
 
@@ -64,6 +68,7 @@ def add_news():
         new.text = form.text.data
         new.creator = current_user.nickname
         new.color = form.color.data
+        new.category = form.category.data
         current_user.news.append(new)
         sessions.merge(current_user)
         sessions.commit()
