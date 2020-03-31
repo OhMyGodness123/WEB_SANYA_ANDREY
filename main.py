@@ -42,16 +42,17 @@ class LoginForm(FlaskForm):
 
 
 class NewsForm(FlaskForm):
-    title = StringField('Заголовок', validators=[DataRequired()])
-    text = TextAreaField('Содержание')
+    title = StringField('Заголовок:', validators=[DataRequired()])
+    text = TextAreaField('Содержание:')
     color = StringField('Цвет новости: #')
     category = SelectField('Категория',
                            choices=[('Новости', 'Новости'), ('Софт', 'Софт'), ('Халява', 'Халява'),
                                     ('Обсуждение игр', 'Обсуждение игр')])
-    submit = SubmitField('Применить')
+    submit = SubmitField('Создать')
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect('/')
@@ -91,7 +92,7 @@ def news_delete(id):
     return redirect('/')
 
 
-@app.route('/news/<int:id>', methods=['GET', 'POST'])
+@app.route('/change_news/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_news(id):
     form = NewsForm()
@@ -117,8 +118,9 @@ def edit_news(id):
             return redirect('/')
         else:
             abort(404)
-    return render_template('add_news.html', title='Редактирование новости', form=form,
-                           nickname=current_user.nickname, image=current_user.avatar)
+    return render_template('add_news.html', form=form,
+                           nickname=current_user.nickname, image=current_user.avatar,
+                           title='Редактирование')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -147,13 +149,15 @@ def reqister():
         except PermissionError:
             img = random.choice(['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png',
                                  'avatar5.png', 'avatar6.png', 'avatar7.png'])
-            path = f"static/img/{img}"
+            path = f"/static/img/{img}"
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
         session = db_session.create_session()
-        if session.query(users.User).filter(users.User.email == form.email.data).first():
+        if session.query(users.User).filter(
+                users.User.email == form.email.data).first() or session.query(users.User).filter(
+            users.User.nickname == form.name.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
@@ -173,7 +177,25 @@ def reqister():
 def index():
     session = db_session.create_session()
     new = session.query(news.News).all()
-    (new).reverse()
+    new.reverse()
+    if current_user.is_authenticated:
+        return render_template('forum.html', title='Todoroki', nickname=current_user.nickname,
+                               image=current_user.avatar, news=new)
+    return render_template('forum.html', title='Todoroki', news=new)
+
+
+@app.route("/<category>")
+def sorted_news(category):
+    session = db_session.create_session()
+    if category == 'only_games':
+        new = session.query(news.News).filter(news.News.category == 'Обсуждение игр').all()
+    elif category == 'only_soft':
+        new = session.query(news.News).filter(news.News.category == 'Софт').all()
+    elif category == 'only_halyava':
+        new = session.query(news.News).filter(news.News.category == 'Халява').all()
+    else:
+        new = session.query(news.News).filter(news.News.category == 'Новости').all()
+    new.reverse()
     if current_user.is_authenticated:
         return render_template('forum.html', title='Todoroki', nickname=current_user.nickname,
                                image=current_user.avatar, news=new)
