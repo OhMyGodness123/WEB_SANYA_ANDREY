@@ -6,6 +6,7 @@
             {% if current_user.is_authenticated %}
                 <a href="/news"><button type="button" class="btn btn-outline-success" style="margin-bottom: 30px;">Создать тему</button></a>
             {% endif %}
+            <li><a href="/">Все новости</a></li>
             <li><a href="/only_news">Новости</a></li>
             <li><a href="/only_soft">Софт</a></li>
             <li><a href="/only_halyava">Халява</a></li>
@@ -18,15 +19,27 @@
     {% for item in news %}
         {% set idd = item.id %}
         {% set stylee = "text-align:center;" + "color:#" ~ item.color + ";" %}
-        {% set hr = '/news/' ~ idd %}
+        {% set hr = '/discussion/' ~ idd %}
         {% set hr3 = '/change_news/' ~ idd %}
         {% set hr2 = '/news_delete/' ~ idd %}
         <div class="rainbowborder">
+            {% if current_user.is_authenticated and (current_user.root == 1 or current_user == item.user) %}
+                <div style="display: flex; justify-content: space-between;">
+                    {% else %}
+              <div>
+                  {% endif %}
              {% if current_user.is_authenticated and (current_user.root == True or current_user == item.user) %}
             <a href={{hr2}}><i class="fa fa-trash-o" aria-hidden="true" style="color: red; font-size: 30px; padding-left: 10px; padding-top: 5px;"></i></a>
-            <a href={{hr3}}><i class="fa fa-pencil" aria-hidden="true" style="font-size: 30px;padding-left: 93%;"></i></a>
                {% endif %}
-            <a style="text-decoration: none;" href={{hr}}><h2 style={{stylee}}>{{item.title}}</h2></a>
+                  {% if item.title|length > 30 %}
+                    <a style="text-decoration: none;" href={{hr}}><h2 style={{stylee}}>{{item.title[0:30]}}...</h2></a>
+                  {% else %}
+                    <a style="text-decoration: none;" href={{hr}}><h2 style={{stylee}}>{{item.title}}</h2></a>
+                  {% endif %}
+                {% if current_user.is_authenticated and (current_user.root == True or current_user == item.user) %}
+                        <a href={{hr3}}><i class="fa fa-pencil" aria-hidden="true" style="font-size: 30px;padding-right: 10px;"></i></a>
+                {% endif %}
+                </div>
             <div style="margin-left: 30px; color: white;">
 
                 Автор - {{item.user.nickname}}, <br>

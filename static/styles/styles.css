@@ -64,7 +64,7 @@ nav a {
     float: left;
     font-size: 19px;
     width: 15%;
-    height: 280px;
+    height: 350px;
     margin-left: 190px;
     margin-top: 40px;
     border-radius: 14px;
@@ -91,4 +91,17 @@ nav a {
   border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
   border-image-slice: 1;
   margin-bottom: 20px;
+}
+
+.discus {
+    background: #000000;
+    font-size: 19px;
+    width: 70%;
+    margin-left: 280px;
+    margin-top: 40px;
+    border-radius: 14px;
+    padding-left: 100px;
+    padding-right: 45px;
+    padding-top: 60px;
+    padding-bottom: 60px;
 }

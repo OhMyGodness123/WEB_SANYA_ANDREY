@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField, \
     SelectField
+import json
 from wtforms.validators import DataRequired
 from data import db_session, news, users
 import random
@@ -41,6 +42,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Войти')
 
 
+class ForumForm(FlaskForm):
+    message = TextAreaField('Введите своё сообщение:', validators=[DataRequired()])
+    submit = SubmitField('Отправить')
+
+
 class NewsForm(FlaskForm):
     title = StringField('Заголовок:', validators=[DataRequired()])
     text = TextAreaField('Содержание:')
@@ -66,13 +72,25 @@ def add_news():
         sessions = db_session.create_session()
         new = news.News()
         new.title = form.title.data
-        new.text = form.text.data
+        new.text = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
         new.creator = current_user.nickname
         new.color = form.color.data
         new.category = form.category.data
         current_user.news.append(new)
         sessions.merge(current_user)
         sessions.commit()
+
+        with open('forum.json', 'r') as jfr:
+            jf_file = json.load(jfr)
+
+        with open('forum.json', 'w') as jf:
+            jf_target = jf_file["topics"]
+            user_info = {"messages": [
+                {"text": form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;'),
+                 "author": current_user.nickname}]}
+            jf_target.append(user_info)
+            json.dump(jf_file, jf, indent=4)
+
         return redirect('/')
     return render_template('add_news.html', title='Добавление новости', form=form,
                            nickname=current_user.nickname, image=current_user.avatar)
@@ -87,6 +105,13 @@ def news_delete(id):
     if new:
         sessions.delete(new)
         sessions.commit()
+        with open('forum.json', 'r') as fp:
+            jsondata = json.load(fp)
+        jsondata = {
+            'topics': [obj for obj in jsondata["topics"] if
+                       jsondata["topics"].index(obj) != id - 1]}
+        with open('forum.json', 'w') as jf:
+            json.dump(jsondata, jf, indent=4)
     else:
         abort(404)
     return redirect('/')
@@ -102,7 +127,8 @@ def edit_news(id):
                                                news.News.user == current_user).first()
         if new:
             form.title.data = new.title
-            form.text.data = new.text
+            form.text.data = new.text.replace('<br />&nbsp;&nbsp;&nbsp;', '')
+            form.category.data = new.category
             form.color.data = new.color
         else:
             abort(404)
@@ -114,7 +140,16 @@ def edit_news(id):
             new.title = form.title.data
             new.text = form.text.data
             new.color = form.color.data
+            new.category = form.category.data
             sessions.commit()
+
+            with open('forum.json') as f:
+                data = json.load(f)
+            data["topics"][id - 1]["messages"][0]["text"] = form.text.data.replace('\n',
+                                                                                   '<br />&nbsp;&nbsp;&nbsp;')
+            with open('forum.json', 'w') as f:
+                json.dump(data, indent=4, fp=f)
+
             return redirect('/')
         else:
             abort(404)
@@ -184,6 +219,34 @@ def index():
     return render_template('forum.html', title='Todoroki', news=new)
 
 
+@app.route("/discussion/<int:news_id>", methods=['GET', 'POST'])
+def discussion(news_id):
+    forum = ForumForm()
+    session = db_session.create_session()
+    new = session.query(news.News).filter(news.News.id == news_id).first()
+    messages = forum.message.data
+    if forum.validate_on_submit():
+        write_to_json(messages, current_user.nickname, news_id)
+    with open('forum.json', 'r') as jfr:
+        info = json.load(jfr)["topics"][news_id - 1]["messages"]
+    if current_user.is_authenticated:
+        return render_template('discussion.html', nickname=current_user.nickname,
+                               image=current_user.avatar, messages=info, form=forum,
+                               title=new.title, category=new.category)
+    return render_template('discussion.html', messages=info, form=forum, title=new.title,
+                           category=new.category)
+
+
+def write_to_json(text, author, news_id):
+    with open('forum.json', 'r') as jfr:
+        jf_file = json.load(jfr)
+    with open('forum.json', 'w') as jf:
+        jf_target = jf_file["topics"][news_id - 1]["messages"]
+        user_info = {"text": text, "author": author}
+        jf_target.append(user_info)
+        json.dump(jf_file, jf, indent=4)
+
+
 @app.route("/<category>")
 def sorted_news(category):
     session = db_session.create_session()
@@ -204,13 +267,15 @@ def sorted_news(category):
 
 @app.route('/market')
 def market():
-    return render_template('market.html', title='Todoroki | Маркет', nickname=current_user.nickname,
-                           image=current_user.avatar)
+    if current_user.is_authenticated:
+        return render_template('market.html', title='Todoroki | Маркет', nickname=current_user.nickname,
+                            image=current_user.avatar)
+    return render_template('market.html', title='Todoroki | Маркет')
 
 
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=1414, host='127.0.0.1')
+    app.run(port=14, host='127.0.0.1')
 
 
 if __name__ == '__main__':
