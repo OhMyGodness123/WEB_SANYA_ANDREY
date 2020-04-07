@@ -14,7 +14,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     nickname = sqlalchemy.Column(sqlalchemy.String, unique=True)
     email = sqlalchemy.Column(sqlalchemy.String)
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
-    date_of_registration = sqlalchemy.Column(sqlalchemy.String, default=datetime.datetime.now().date())
+    date_of_registration = sqlalchemy.Column(sqlalchemy.String,
+                                             default=datetime.datetime.now().date())
     root = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     avatar = sqlalchemy.Column(sqlalchemy.String)
     news = orm.relation('News', back_populates='user')
