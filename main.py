@@ -3,10 +3,10 @@ from flask_wtf import FlaskForm
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField, \
     SelectField
-import json
 from wtforms.validators import DataRequired
 from data import db_session, news, users
 import random
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -55,6 +55,14 @@ class NewsForm(FlaskForm):
                            choices=[('Новости', 'Новости'), ('Софт', 'Софт'), ('Халява', 'Халява'),
                                     ('Обсуждение игр', 'Обсуждение игр')])
     submit = SubmitField('Создать')
+
+
+class SettingsForm(FlaskForm):
+    email = StringField('Почта')
+    old_pass = PasswordField('Старый пароль', validators=[DataRequired()])
+    new_pass = PasswordField('Новый пароль')
+    new_pass_again = PasswordField('Подтвердите новый пароль')
+    submit = SubmitField('Сохранить')
 
 
 @app.route('/logout')
@@ -273,9 +281,47 @@ def market():
     return render_template('market.html', title='Todoroki | Маркет')
 
 
+@app.route('/profile')
+def my_profile():
+    return render_template('my_profile.html', title='Todoroki | Мой профиль',
+                           nickname=current_user.nickname, image=current_user.avatar,
+                           mail=current_user.email, created_date=current_user.date_of_registration)
+
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    form = SettingsForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        user = session.query(users.User).filter(users.User.id == current_user.id).first()
+        if user.check_password(form.old_pass.data):
+            if form.new_pass.data == form.new_pass_again.data and form.new_pass.data != '':
+                if user:
+                    user.set_password(form.new_pass.data)
+                    session.commit()
+                    return redirect('/')
+                else:
+                    abort(404)
+            elif current_user.email != form.email.data:
+                user.email = form.email.data
+                session.commit()
+                return redirect('/')
+            else:
+                print(current_user.email, form.email.data)
+                return render_template('settings.html', title='Todoroki | Настройки',
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       form=form, message='Пароли не совпадают')
+        else:
+            return render_template('settings.html', title='Todoroki | Настройки',
+                                   nickname=current_user.nickname, image=current_user.avatar,
+                                   form=form, message='Неверный пароль')
+    return render_template('settings.html', title='Todoroki | Настройки',
+                           nickname=current_user.nickname, image=current_user.avatar, form=form)
+
+
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=14, host='127.0.0.1')
+    app.run(port=1414, host='127.0.0.1')
 
 
 if __name__ == '__main__':
