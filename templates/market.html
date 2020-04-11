@@ -1,5 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1> МАРКЕТ</h1>
+<div class="icons2">
+    <ul style="list-style: none;">
+        {% if current_user.is_authenticated %}
+        <li>
+            <a href="/add_item">
+                <button type="button" class="btn btn-outline-success" style="margin-bottom: 20px;margin-right: 24px;margin-top: 30px;">
+                    Выставить аккаунт на продажу
+                </button>
+            </a>
+        </li>
+        {% endif %}
+        <li style="font-size: 20px; text-align: center;margin-right: 24px">Сортировка товара по категорям:</li>
+        <li style="padding-left: 29%;"><a href="/market/vk"><i class="fa fa-vk" aria-hidden="true"
+                                          style="color:#597da3"></i></a></li>
+        <li style="padding-left: 29%;"><a href="/market/telegram"><i class="fa fa-telegram" aria-hidden="true"
+                                          style="color:#0088cc"></i></a></li>
+        <li style="padding-left: 29%;color:white"><a href="/market/steam"><i style='color:white' class="fa fa-steam-square" aria-hidden="true"></i></a></li>
+        <li style="padding-left: 29%;"><a href="/market/instagram"><i class="fa fa-instagram" aria-hidden="true"
+                                          style="color:#C13584"></i></a></li>
+        <li style="padding-left: 29%;"><a href="/market"><i class="fa fa-globe" aria-hidden="true"
+                                          style="color:#7FFFD4"></i></a></li>
+    </ul>
+</div>
+<div class="goods">
+    {% for item in item_list %}
+    {% set hr_edit = '/change_item/' ~ item_list[item][5] %}
+    {% set hr_delete = '/delete_item/' ~ item_list[item][5] %}
+    <div style=" display: flex;
+
+    flex-direction: row;
+
+    justify-content: flex-start;;">
+    <div class="border-gradient border-gradient-green" >
+        {% if item_list[item][4] == 'ВК' %}
+            <p style="text-align: center; color: white;">{{item}} <i class="fa fa-vk" aria-hidden="true"
+                                              style="color:#597da3"></i></p>
+        {% elif item_list[item][4] == 'Telegram' %}
+            <p style="text-align: center; color: white;">{{item}} <i class="fa fa-telegram" aria-hidden="true"
+                                              style="color:#0088cc"></i></p>
+        {% elif item_list[item][4] == 'Steam' %}
+            <p style="text-align: center; color: white;">{{item}} <i class="fa fa-steam-square" aria-hidden="true"></i></p>
+        {% elif item_list[item][4] == 'Instagram' %}
+            <p style="text-align: center; color: white;">{{item}} <i class="fa fa-instagram" aria-hidden="true"
+                                              style="color:#C13584"></i></p>
+        {% else %}
+            <p style="text-align: center; color: white;">{{item}} <i class="fa fa-globe" aria-hidden="true"
+                                              style="color:#7FFFD4"></i></p>
+        {% endif %}
+        <a target="_blank" style='float: right;' href={{item_list[item][2]}} class="btn btn-outline-primary">Написать продавцу</a></nobr>
+        <p style=' color: white;'>{{item_list[item][0]}} ₽; Количество - {{item_list[item][1]}} <br> Продавец - {{item_list[item][3]}}</p>
+    </div>
+    {% if current_user.is_authenticated and (current_user.root == 1 or item_list[item][6] == current_user.nickname) %}
+    <div>
+    <a href={{hr_edit}} style="height: 20px;"><i class="fa fa-pencil" aria-hidden="true" style="font-size: 25px;margin-top: 50px;margin-left: 18px;"></i></a>
+    <a href={{hr_delete}} style="height: 20px;"><i class="fa fa-trash-o" aria-hidden="true" style="color: red; font-size: 25px;margin-top: 15px; margin-left: 18px;"></i></a>
+    </div>
+    </div>
+
+    {% endif %}
+
+    {% endfor %}
+</div>
+
 {% endblock %}

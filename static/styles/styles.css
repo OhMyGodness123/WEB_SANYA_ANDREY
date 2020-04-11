@@ -105,3 +105,61 @@ nav a {
     padding-top: 60px;
     padding-bottom: 60px;
 }
+
+.sale {
+    background: #000000;
+    font-size: 19px;
+    width: 68%;
+    margin-left: 16%;
+    margin-top: 40px;
+    border-radius: 14px;
+    padding-left: 100px;
+    padding-right: 45px;
+    padding-top: 60px;
+    padding-bottom: 60px;
+
+}
+
+.green {
+ color: #ffffff;
+ text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 40px #00ff00, 0 0 80px #00ff00, 0 0 90px #00ff00, 0 0 100px #00ff00, 0 0 150px #00ff00;
+}
+
+.goods {
+  width: 70%;
+  padding-top: 10px;
+  padding-bottom: 50px;
+  background-color: black;
+  margin-left: 17%;
+  border-radius: 7px;
+  margin-top: 20px;
+  padding-left: 5%;
+}
+
+.border-gradient-green {
+  border: solid;
+  border-image-slice: 1;
+  color: white;
+  border-radius: 6px;
+  width: 96%;
+  padding-left: 5px;
+  height: 95px;
+  padding-right: 6px;
+  border-width: 3px;
+  margin-top: 40px;
+  border-image-source: linear-gradient(to left, #ff0000, #fdff00);
+}
+
+.icons2{
+  width: 14%;
+  padding-top: 10px;
+  padding-bottom: 50px;
+  background-color: black;
+  color: white;
+  margin-left: 4%;
+  list-style: none;
+  border-radius: 7px;
+  margin-top: 20px;
+  font-size: 50px;
+  float: left;
+}

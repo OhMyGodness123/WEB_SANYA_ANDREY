@@ -20,24 +20,24 @@
         {% set idd = item.id %}
         {% set stylee = "text-align:center;" + "color:#" ~ item.color + ";" %}
         {% set hr = '/discussion/' ~ idd %}
-        {% set hr3 = '/change_news/' ~ idd %}
-        {% set hr2 = '/news_delete/' ~ idd %}
+        {% set hr_edit = '/change_news/' ~ idd %}
+        {% set hr_delete = '/news_delete/' ~ idd %}
         <div class="rainbowborder">
             {% if current_user.is_authenticated and (current_user.root == 1 or current_user == item.user) %}
                 <div style="display: flex; justify-content: space-between;">
                     {% else %}
               <div>
                   {% endif %}
-             {% if current_user.is_authenticated and (current_user.root == True or current_user == item.user) %}
-            <a href={{hr2}}><i class="fa fa-trash-o" aria-hidden="true" style="color: red; font-size: 30px; padding-left: 10px; padding-top: 5px;"></i></a>
+             {% if current_user.is_authenticated and (current_user.root == 1 or current_user == item.user) %}
+            <a href={{hr_delete}}><i class="fa fa-trash-o" aria-hidden="true" style="color: red; font-size: 30px; padding-left: 10px; padding-top: 5px;"></i></a>
                {% endif %}
                   {% if item.title|length > 30 %}
                     <a style="text-decoration: none;" href={{hr}}><h2 style={{stylee}}>{{item.title[0:30]}}...</h2></a>
                   {% else %}
                     <a style="text-decoration: none;" href={{hr}}><h2 style={{stylee}}>{{item.title}}</h2></a>
                   {% endif %}
-                {% if current_user.is_authenticated and (current_user.root == True or current_user == item.user) %}
-                        <a href={{hr3}}><i class="fa fa-pencil" aria-hidden="true" style="font-size: 30px;padding-right: 10px;"></i></a>
+                {% if current_user.is_authenticated and (current_user.root == 1 or current_user == item.user) %}
+                        <a href={{hr_edit}}><i class="fa fa-pencil" aria-hidden="true" style="font-size: 30px;padding-right: 10px;"></i></a>
                 {% endif %}
                 </div>
             <div style="margin-left: 30px; color: white;">

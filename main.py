@@ -3,8 +3,9 @@ from flask_wtf import FlaskForm
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField, \
     SelectField
-from wtforms.validators import DataRequired
-from data import db_session, news, users
+from wtforms import validators
+from vk_user_id import vk_changed_ssilka, old_ssika
+from data import db_session, news, users, accounts, comments
 import random
 import json
 
@@ -28,27 +29,41 @@ def not_found(error):
 
 
 class RegisterForm(FlaskForm):
-    email = StringField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
-    name = StringField('Имя пользователя', validators=[DataRequired()])
+    email = StringField('Почта', [validators.Email()])
+    password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
+    password_again = PasswordField('Повторите пароль', [validators.Length(min=5, max=30)])
+    name = StringField('Имя пользователя', [validators.Length(min=5, max=30)])
     submit = SubmitField('Зарегистрироваться')
 
 
+class SaleForm(FlaskForm):
+    name = StringField('Название товара:', [validators.Length(min=5, max=80)])
+    category = SelectField('Категория:',
+                           choices=[('ВК', 'ВК'), ('Telegram', 'Telegram'), ('Steam', 'Steam'),
+                                    ('Instagram', 'Instagram'), ('Другое', 'Другое')])
+    contact_info = StringField('Ссылка на страницу Вконтакте:', [validators.Length(min=15, max=50)])
+    price = StringField('Цена товара:', [validators.Length(min=1, max=30)])
+    count = SelectField('Количество товара:',
+                        choices=[('1', '1'), ('2', '2'), ('3', '3'),
+                                 ('4', '4'), ('5', '5'),
+                                 ('6', '6'), ('7', '7'), ('8', '8'), ('9', '9')])
+    submit = SubmitField('Выставить на продажу')
+
+
 class LoginForm(FlaskForm):
-    email = StringField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
+    email = StringField('Почта', [validators.Email()])
+    password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 
 class ForumForm(FlaskForm):
-    message = TextAreaField('Введите своё сообщение:', validators=[DataRequired()])
+    message = TextAreaField('Введите своё сообщение:', [validators.Length(min=4, max=4430)])
     submit = SubmitField('Отправить')
 
 
 class NewsForm(FlaskForm):
-    title = StringField('Заголовок:', validators=[DataRequired()])
+    title = StringField('Заголовок:', [validators.Length(min=4, max=166)])
     text = TextAreaField('Содержание:')
     color = StringField('Цвет новости: #')
     category = SelectField('Категория',
@@ -59,7 +74,7 @@ class NewsForm(FlaskForm):
 
 class SettingsForm(FlaskForm):
     email = StringField('Почта')
-    old_pass = PasswordField('Старый пароль', validators=[DataRequired()])
+    old_pass = PasswordField('Старый пароль')
     new_pass = PasswordField('Новый пароль')
     new_pass_again = PasswordField('Подтвердите новый пароль')
     submit = SubmitField('Сохранить')
@@ -80,7 +95,8 @@ def add_news():
         sessions = db_session.create_session()
         new = news.News()
         new.title = form.title.data
-        new.text = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
+        texxt = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
+        new.text = texxt
         new.creator = current_user.nickname
         new.color = form.color.data
         new.category = form.category.data
@@ -88,16 +104,15 @@ def add_news():
         sessions.merge(current_user)
         sessions.commit()
 
-        with open('forum.json', 'r') as jfr:
-            jf_file = json.load(jfr)
+        new = sessions.query(news.News).filter(news.News.text == texxt).first()
 
-        with open('forum.json', 'w') as jf:
-            jf_target = jf_file["topics"]
-            user_info = {"messages": [
-                {"text": form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;'),
-                 "author": current_user.nickname}]}
-            jf_target.append(user_info)
-            json.dump(jf_file, jf, indent=4)
+        comment = comments.Comments()
+        comment.text = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
+        comment.nickname = current_user.nickname
+        comment.for_topic = new.id
+        comment.first_com = 'Y'
+        sessions.add(comment)
+        sessions.commit()
 
         return redirect('/')
     return render_template('add_news.html', title='Добавление новости', form=form,
@@ -113,13 +128,10 @@ def news_delete(id):
     if new:
         sessions.delete(new)
         sessions.commit()
-        with open('forum.json', 'r') as fp:
-            jsondata = json.load(fp)
-        jsondata = {
-            'topics': [obj for obj in jsondata["topics"] if
-                       jsondata["topics"].index(obj) != id - 1]}
-        with open('forum.json', 'w') as jf:
-            json.dump(jsondata, jf, indent=4)
+        for comment in sessions.query(comments.Comments).filter(
+                comments.Comments.for_topic == id).all():
+            sessions.delete(comment)
+            sessions.commit()
     else:
         abort(404)
     return redirect('/')
@@ -144,20 +156,15 @@ def edit_news(id):
         sessions = db_session.create_session()
         new = sessions.query(news.News).filter(news.News.id == id,
                                                news.News.user == current_user).first()
+        comment = sessions.query(comments.Comments).filter(comments.Comments.for_topic == id,
+                                                           comments.Comments.first_com == 'Y').first()
         if new:
             new.title = form.title.data
             new.text = form.text.data
+            comment.text = form.text.data
             new.color = form.color.data
             new.category = form.category.data
             sessions.commit()
-
-            with open('forum.json') as f:
-                data = json.load(f)
-            data["topics"][id - 1]["messages"][0]["text"] = form.text.data.replace('\n',
-                                                                                   '<br />&nbsp;&nbsp;&nbsp;')
-            with open('forum.json', 'w') as f:
-                json.dump(data, indent=4, fp=f)
-
             return redirect('/')
         else:
             abort(404)
@@ -234,25 +241,23 @@ def discussion(news_id):
     new = session.query(news.News).filter(news.News.id == news_id).first()
     messages = forum.message.data
     if forum.validate_on_submit():
-        write_to_json(messages, current_user.nickname, news_id)
-    with open('forum.json', 'r') as jfr:
-        info = json.load(jfr)["topics"][news_id - 1]["messages"]
+        comment = comments.Comments()
+        comment.text = messages.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
+        comment.nickname = current_user.nickname
+        comment.for_topic = new.id
+        comment.first_com = 'Y'
+        session.add(comment)
+        session.commit()
+    dict_com = []
+    for comment in session.query(comments.Comments).filter(
+            comments.Comments.for_topic == news_id).all():
+        dict_com.append({'text': comment.text, 'author': comment.nickname})
     if current_user.is_authenticated:
         return render_template('discussion.html', nickname=current_user.nickname,
-                               image=current_user.avatar, messages=info, form=forum,
+                               image=current_user.avatar, messages=dict_com, form=forum,
                                title=new.title, category=new.category)
-    return render_template('discussion.html', messages=info, form=forum, title=new.title,
+    return render_template('discussion.html', messages=dict_com, form=forum, title=new.title,
                            category=new.category)
-
-
-def write_to_json(text, author, news_id):
-    with open('forum.json', 'r') as jfr:
-        jf_file = json.load(jfr)
-    with open('forum.json', 'w') as jf:
-        jf_target = jf_file["topics"][news_id - 1]["messages"]
-        user_info = {"text": text, "author": author}
-        jf_target.append(user_info)
-        json.dump(jf_file, jf, indent=4)
 
 
 @app.route("/<category>")
@@ -273,14 +278,7 @@ def sorted_news(category):
     return render_template('forum.html', title='Todoroki', news=new)
 
 
-@app.route('/market')
-def market():
-    if current_user.is_authenticated:
-        return render_template('market.html', title='Todoroki | Маркет', nickname=current_user.nickname,
-                            image=current_user.avatar)
-    return render_template('market.html', title='Todoroki | Маркет')
-
-
+@login_required
 @app.route('/profile')
 def my_profile():
     return render_template('my_profile.html', title='Todoroki | Мой профиль',
@@ -288,6 +286,7 @@ def my_profile():
                            mail=current_user.email, created_date=current_user.date_of_registration)
 
 
+@login_required
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     form = SettingsForm()
@@ -307,21 +306,138 @@ def settings():
                 session.commit()
                 return redirect('/')
             else:
-                print(current_user.email, form.email.data)
-                return render_template('settings.html', title='Todoroki | Настройки',
+                return render_template('settings.html',
                                        nickname=current_user.nickname, image=current_user.avatar,
                                        form=form, message='Пароли не совпадают')
         else:
-            return render_template('settings.html', title='Todoroki | Настройки',
+            return render_template('settings.html',
                                    nickname=current_user.nickname, image=current_user.avatar,
                                    form=form, message='Неверный пароль')
     return render_template('settings.html', title='Todoroki | Настройки',
                            nickname=current_user.nickname, image=current_user.avatar, form=form)
 
 
+@login_required
+@app.route('/add_item', methods=['POST', 'GET'])
+def add_item():
+    form = SaleForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        acc = accounts.Accounts()
+        acc.title = form.name.data
+        acc.count = form.count.data
+        acc.type = form.category.data
+        acc.price = form.price.data
+        acc.user_name = current_user.nickname
+        try:
+            acc.vk_silka = vk_changed_ssilka(form.contact_info.data)
+        except TypeError:
+            return render_template('add_item.html', form=form, message='Неверная ссылка!')
+        session.add(acc)
+        session.commit()
+        items = session.query(accounts.Accounts).all()
+        item_list = {}
+        for item in items:
+            item_list[item.title] = [item.price, item.count, item.vk_silka, item.user_name,
+                                     item.type, item.id, item.user_name]
+        if current_user.is_authenticated:
+            return render_template('market.html',
+                                   nickname=current_user.nickname,
+                                   image=current_user.avatar, item_list=item_list)
+        return render_template('market.html', item_list=item_list)
+
+    if current_user.is_authenticated:
+        return render_template('add_item.html',
+                               nickname=current_user.nickname,
+                               image=current_user.avatar, form=form)
+    return render_template('add_item.html', form=form)
+
+
+@app.route('/market', methods=['POST', 'GET'])
+def market():
+    session = db_session.create_session()
+    items = session.query(accounts.Accounts).all()
+    item_list = {}
+    for item in items:
+        item_list[item.title] = [item.price, item.count, item.vk_silka, item.user_name,
+                                 item.type, item.id, item.user_name]
+    if current_user.is_authenticated:
+        return render_template('market.html',
+                               nickname=current_user.nickname,
+                               image=current_user.avatar, item_list=item_list)
+    return render_template('market.html', item_list=item_list)
+
+
+@app.route('/delete_item/<int:id>', methods=['GET', 'POST'])
+@login_required
+def item_delete(id):
+    sessions = db_session.create_session()
+    item = sessions.query(accounts.Accounts).filter(accounts.Accounts.id == id).first()
+    if item:
+        sessions.delete(item)
+        sessions.commit()
+    else:
+        abort(404)
+    return redirect('/market')
+
+
+@app.route('/change_item/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_item(id):
+    form = SaleForm()
+    if request.method == 'GET':
+        sessions = db_session.create_session()
+        item = sessions.query(accounts.Accounts).filter(accounts.Accounts.id == id).first()
+        if item:
+            form.name.data = item.title
+            form.category.data = item.type
+            form.contact_info.data = old_ssika(item.vk_silka)
+            form.price.data = item.price
+            form.count.data = item.count
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        sessions = db_session.create_session()
+        item = sessions.query(accounts.Accounts).filter(accounts.Accounts.id == id).first()
+        if item:
+            item.title = form.name.data
+            item.type = form.category.data
+            item.vk_silka = vk_changed_ssilka(form.contact_info.data)
+            item.price = form.price.data
+            item.count = form.count.data
+            sessions.commit()
+            return redirect('/market')
+        else:
+            abort(404)
+    return render_template('add_item.html', form=form,
+                           nickname=current_user.nickname, image=current_user.avatar)
+
+
+@app.route('/market/<category>', methods=['POST', 'GET'])
+def sorted_market(category):
+    session = db_session.create_session()
+    if category == 'vk':
+        items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'ВК')
+    elif category == 'telegram':
+        items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'Telegram')
+    elif category == 'steam':
+        items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'Steam')
+    elif category == 'instagram':
+        items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'Instagram')
+    item_list = {}
+    for item in items:
+        item_list[item.title] = [item.price, item.count, item.vk_silka, item.user_name,
+                                 item.type, item.id, item.user_name]
+    if current_user.is_authenticated:
+        return render_template('market.html',
+                               nickname=current_user.nickname,
+                               image=current_user.avatar, item_list=item_list)
+    return render_template('market.html', item_list=item_list)
+
+
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=1414, host='127.0.0.1')
+    app.run(port=552, host='127.0.0.1')
 
 
 if __name__ == '__main__':

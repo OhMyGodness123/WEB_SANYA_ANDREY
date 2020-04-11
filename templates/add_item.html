@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="sale">
+        <h1 class="green" style="text-align: center;">Продажа аккаунта</h1>
+        <form action="" method="post" style="padding-top: 20px;">
+            {{ form.hidden_tag() }}
+            <p style="color: white">
+                {{ form.name.label }}<br>
+                {{ form.name(class="form-control", style='color: black') }}<br>
+                {% for error in form.name.errors %}
+                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+
+            <p style="color: white">
+                {{ form.category.label }}<br>
+                {{ form.category(class="form-control", style='color: black') }}<br>
+                {% for error in form.category.errors %}
+                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+
+            <p style="color: white">
+                {{ form.contact_info.label }}<br>
+                {{ form.contact_info(class="form-control", placeholder="https://vk.com/gavrin1992", style='color: black') }}<br>
+                {% for error in form.contact_info.errors %}
+                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+
+            <p style="color: white">
+                {{ form.price.label }}<br>
+                {{ form.price(class="form-control", style='color: black') }}<br>
+                {% for error in form.price.errors %}
+                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+
+            <p style="color: white">
+                {{ form.count.label }}<br>
+                {{ form.count(class="form-control", style='color: black') }}<br>
+                {% for error in form.count.errors %}
+                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+
+
+            <p>{{ form.submit(type="submit", class="btn btn-success") }}</p>
+             <p content="alert alert-danger" role="alert" style="color: white">
+            {{ message }}
+            </p>
+        </form>
+    </div>
+{% endblock %}

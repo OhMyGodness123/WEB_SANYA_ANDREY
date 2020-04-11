@@ -33,6 +33,8 @@
         <p style="color: white">{{ form.submit(type="submit", class="btn btn-outline-warning")
             }}</p>
     </form>
+    {% else %}
+        <span style="color: red">Только зарегистрированные пользователи могут оставлять свои комментарии</span>
     {% endif %}
 </div>
 {% endblock %}
