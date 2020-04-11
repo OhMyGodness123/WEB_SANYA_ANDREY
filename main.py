@@ -8,6 +8,7 @@ from vk_user_id import vk_changed_ssilka, old_ssika
 from data import db_session, news, users, accounts, comments
 import random
 import json
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -259,7 +260,6 @@ def discussion(news_id):
     return render_template('discussion.html', messages=dict_com, form=forum, title=new.title,
                            category=new.category)
 
-
 @app.route("/<category>")
 def sorted_news(category):
     session = db_session.create_session()
@@ -435,9 +435,23 @@ def sorted_market(category):
     return render_template('market.html', item_list=item_list)
 
 
+@app.route('/about')
+def about():
+    map_request = "https://static-maps.yandex.ru/1.x/" \
+                  "?ll=40.692507%2C55.614970&z=17&l=map&pt=40.692075%2C55.614979"
+    response = requests.get(map_request)
+    map_file = "static/img/map.png"
+    with open(map_file, "wb") as file:
+        file.write(response.content)
+    if current_user.is_authenticated:
+        return render_template('about.html', nickname=current_user.nickname,
+                               image=current_user.avatar, filename=map_file)
+    return render_template('about.html', filename=map_file)
+
+
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=552, host='127.0.0.1')
+    app.run(port=1414, host='127.0.0.1')
 
 
 if __name__ == '__main__':
