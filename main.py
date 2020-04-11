@@ -7,6 +7,7 @@ from wtforms.validators import DataRequired
 from data import db_session, news, users
 import random
 import json
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -276,8 +277,9 @@ def sorted_news(category):
 @app.route('/market')
 def market():
     if current_user.is_authenticated:
-        return render_template('market.html', title='Todoroki | Маркет', nickname=current_user.nickname,
-                            image=current_user.avatar)
+        return render_template('market.html', title='Todoroki | Маркет',
+                               nickname=current_user.nickname,
+                               image=current_user.avatar)
     return render_template('market.html', title='Todoroki | Маркет')
 
 
@@ -307,7 +309,6 @@ def settings():
                 session.commit()
                 return redirect('/')
             else:
-                print(current_user.email, form.email.data)
                 return render_template('settings.html', title='Todoroki | Настройки',
                                        nickname=current_user.nickname, image=current_user.avatar,
                                        form=form, message='Пароли не совпадают')
@@ -319,9 +320,23 @@ def settings():
                            nickname=current_user.nickname, image=current_user.avatar, form=form)
 
 
+@app.route('/about')
+def about():
+    map_request = "https://static-maps.yandex.ru/1.x/" \
+                  "?ll=40.692507%2C55.614970&z=17&l=map&pt=40.692075%2C55.614979"
+    response = requests.get(map_request)
+    map_file = "static/img/map.png"
+    with open(map_file, "wb") as file:
+        file.write(response.content)
+    if current_user.is_authenticated:
+        return render_template('about.html', nickname=current_user.nickname,
+                               image=current_user.avatar, filename=map_file)
+    return render_template('about.html', filename=map_file)
+
+
 def main():
     db_session.global_init("db/blogs.sqlite")
-    app.run(port=1414, host='127.0.0.1')
+    app.run(port=32, host='127.0.0.1')
 
 
 if __name__ == '__main__':
