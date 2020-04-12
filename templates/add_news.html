@@ -14,7 +14,7 @@
             {{ form.title.label(style="color: white") }}<br>
             {{ form.title(class="form-control", style="width: 900px") }}<br>
             {% for error in form.title.errors %}
-        <p class="alert alert-danger" role="alert" style="width: 300px;">
+        <p  style="color: red">
             {{ error }}
         </p>
         {% endfor %}
@@ -23,7 +23,7 @@
             {{ form.text.label(style="color: white") }}<br>
             {{ form.text(class="form-control", style="width: 900px; height: 200px;") }}<br>
             {% for error in form.text.errors %}
-        <p content="alert alert-danger" role="alert" style="width: 300px;">
+        <p  style="color: red">
             {{ error }}
         </p>
         {% endfor %}
@@ -32,7 +32,7 @@
             {{ form.category.label(style="color: white") }}<br>
             {{ form.category(class="form-control", style="width: 900px") }}<br>
             {% for error in form.category.errors %}
-        <p content="alert alert-danger" role="alert" style="width: 300px;">
+        <p style="color: red">
             {{ error }}
         </p>
         {% endfor %}
@@ -41,13 +41,13 @@
             {{ form.color.label(style="color: white") }}<br>
             {{ form.color(class="form-control", style="width: 900px") }}<br>
             {% for error in form.color.errors %}
-        <p content="alert alert-danger" role="alert" style="width: 300px;">
+        <p style="color: red">
             {{ error }}
         </p>
         {% endfor %}
         </p>
         <p>{{ form.submit(type="submit", class="btn btn-success", style="width: 160px;") }}</p>
-        <p content="alert alert-danger" role="alert" style="width: 300px;">
+        <p style="color: red">
             {{ message }}
         </p>
     </form>

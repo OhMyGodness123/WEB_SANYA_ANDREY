@@ -9,7 +9,7 @@
                 {{ form.email.label }}<br>
                 {{ form.email(class="form-control", type="email", style="width: 300px;") }}<br>
                 {% for error in form.email.errors %}
-                    <div class="alert alert-danger" role="alert">
+                    <div style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -18,7 +18,7 @@
                 {{ form.old_pass.label }}<br>
                 {{ form.old_pass(class="form-control", type="password", style="width: 300px;") }}<br>
                 {% for error in form.old_pass.errors %}
-                    <div class="alert alert-danger" role="alert">
+                    <div style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -27,7 +27,7 @@
                 {{ form.new_pass.label }}<br>
                 {{ form.new_pass(class="form-control", type="password", style="width: 300px;") }}<br>
                 {% for error in form.new_pass.errors %}
-                    <div class="alert alert-danger" role="alert">
+                    <div style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -36,7 +36,7 @@
                 {{ form.new_pass_again.label }}<br>
                 {{ form.new_pass_again(class="form-control", type="password", style="width: 300px;") }}<br>
                 {% for error in form.new_pass_again.errors %}
-                    <div class="alert alert-danger" role="alert">
+                    <div style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}

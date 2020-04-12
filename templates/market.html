@@ -28,11 +28,15 @@
     {% for item in item_list %}
     {% set hr_edit = '/change_item/' ~ item_list[item][5] %}
     {% set hr_delete = '/delete_item/' ~ item_list[item][5] %}
+      {% if current_user.is_authenticated and (current_user.root == 1 or item_list[item][6] == current_user.nickname) %}
     <div style=" display: flex;
 
     flex-direction: row;
 
     justify-content: flex-start;;">
+        {% else %}
+        <div>
+            {% endif %}
     <div class="border-gradient border-gradient-green" >
         {% if item_list[item][4] == 'ВК' %}
             <p style="text-align: center; color: white;">{{item}} <i class="fa fa-vk" aria-hidden="true"

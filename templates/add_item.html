@@ -9,7 +9,7 @@
                 {{ form.name.label }}<br>
                 {{ form.name(class="form-control", style='color: black') }}<br>
                 {% for error in form.name.errors %}
-                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                    <div style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -19,7 +19,7 @@
                 {{ form.category.label }}<br>
                 {{ form.category(class="form-control", style='color: black') }}<br>
                 {% for error in form.category.errors %}
-                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                    <div  style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -29,7 +29,7 @@
                 {{ form.contact_info.label }}<br>
                 {{ form.contact_info(class="form-control", placeholder="https://vk.com/gavrin1992", style='color: black') }}<br>
                 {% for error in form.contact_info.errors %}
-                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                    <div  style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -39,7 +39,7 @@
                 {{ form.price.label }}<br>
                 {{ form.price(class="form-control", style='color: black') }}<br>
                 {% for error in form.price.errors %}
-                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                    <div style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -49,7 +49,7 @@
                 {{ form.count.label }}<br>
                 {{ form.count(class="form-control", style='color: black') }}<br>
                 {% for error in form.count.errors %}
-                    <div class="alert alert-danger" role="alert" style="width: 300px;">
+                    <div style="color: red">
                         {{ error }}
                     </div>
                 {% endfor %}
@@ -57,7 +57,7 @@
 
 
             <p>{{ form.submit(type="submit", class="btn btn-success") }}</p>
-             <p content="alert alert-danger" role="alert" style="color: white">
+             <p style="color: red">
             {{ message }}
             </p>
         </form>

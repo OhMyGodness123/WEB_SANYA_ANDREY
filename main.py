@@ -10,26 +10,28 @@ import random
 import json
 import requests
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+# подключение библиотек и функций
+
+app = Flask(__name__)  # создание приложения
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # создание ключа
 login_manager = LoginManager()
 login_manager.init_app(app)
-UPLOAD_FOLDER = 'static/img/'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+UPLOAD_FOLDER = '/static/img/'  # путь для сохранения картинок
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  # путь для сохранения картинок
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id):  # функция для загрузки пользователя
     sessions = db_session.create_session()
     return sessions.query(users.User).get(user_id)
 
 
-@app.errorhandler(404)
+@app.errorhandler(404)  # функция ошибки
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
-class RegisterForm(FlaskForm):
+class RegisterForm(FlaskForm):  # класс формы регистрации
     email = StringField('Почта', [validators.Email()])
     password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
     password_again = PasswordField('Повторите пароль', [validators.Length(min=5, max=30)])
@@ -37,7 +39,7 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Зарегистрироваться')
 
 
-class SaleForm(FlaskForm):
+class SaleForm(FlaskForm):  # класс формы продажи аккаунтов
     name = StringField('Название товара:', [validators.Length(min=5, max=80)])
     category = SelectField('Категория:',
                            choices=[('ВК', 'ВК'), ('Telegram', 'Telegram'), ('Steam', 'Steam'),
@@ -51,21 +53,21 @@ class SaleForm(FlaskForm):
     submit = SubmitField('Выставить на продажу')
 
 
-class LoginForm(FlaskForm):
+class LoginForm(FlaskForm):  # класс формы авторизации
     email = StringField('Почта', [validators.Email()])
     password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 
-class ForumForm(FlaskForm):
-    message = TextAreaField('Введите своё сообщение:', [validators.Length(min=4, max=4430)])
+class ForumForm(FlaskForm):  # класс формы обсуждения
+    message = TextAreaField('Введите своё сообщение:', [validators.Length(min=4, max=10000)])
     submit = SubmitField('Отправить')
 
 
-class NewsForm(FlaskForm):
+class NewsForm(FlaskForm):  # класс формы создания новости
     title = StringField('Заголовок:', [validators.Length(min=4, max=166)])
-    text = TextAreaField('Содержание:')
+    text = TextAreaField('Содержание:', [validators.Length(min=2, max=10000)])
     color = StringField('Цвет новости: #')
     category = SelectField('Категория',
                            choices=[('Новости', 'Новости'), ('Софт', 'Софт'), ('Халява', 'Халява'),
@@ -73,22 +75,22 @@ class NewsForm(FlaskForm):
     submit = SubmitField('Создать')
 
 
-class SettingsForm(FlaskForm):
+class SettingsForm(FlaskForm):  # класс формы настроек
     email = StringField('Почта')
     old_pass = PasswordField('Старый пароль')
-    new_pass = PasswordField('Новый пароль')
+    new_pass = PasswordField('Новый пароль', [validators.Length(min=5, max=155)])
     new_pass_again = PasswordField('Подтвердите новый пароль')
     submit = SubmitField('Сохранить')
 
 
-@app.route('/logout')
+@app.route('/logout')  # выход пользователя из системы
 @login_required
 def logout():
     logout_user()
     return redirect('/')
 
 
-@app.route('/news', methods=['GET', 'POST'])
+@app.route('/news', methods=['GET', 'POST'])  # добавление новости
 @login_required
 def add_news():
     form = NewsForm()
@@ -96,8 +98,11 @@ def add_news():
         sessions = db_session.create_session()
         new = news.News()
         new.title = form.title.data
-        texxt = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
-        new.text = texxt
+        text2 = form.text.data.replace('\n',
+                                       '<br />&nbsp;&nbsp;&nbsp;')  # заменяем символ
+        # \n на <br />&nbsp;&nbsp;&nbsp; чтобы на странице в браузере отображались переносы строк
+
+        new.text = text2
         new.creator = current_user.nickname
         new.color = form.color.data
         new.category = form.category.data
@@ -105,7 +110,9 @@ def add_news():
         sessions.merge(current_user)
         sessions.commit()
 
-        new = sessions.query(news.News).filter(news.News.text == texxt).first()
+        # добавляем текст в сущность новостей
+
+        new = sessions.query(news.News).filter(news.News.text == text2).first()
 
         comment = comments.Comments()
         comment.text = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
@@ -115,30 +122,32 @@ def add_news():
         sessions.add(comment)
         sessions.commit()
 
-        return redirect('/')
+        # добавляем текст в сущность коментариев
+
+        return redirect('/')  # возвращаем пользователя на главную страницу
     return render_template('add_news.html', title='Добавление новости', form=form,
                            nickname=current_user.nickname, image=current_user.avatar)
 
 
-@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
+@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])  # удаление новости через её id
 @login_required
 def news_delete(id):
     sessions = db_session.create_session()
     new = sessions.query(news.News).filter(news.News.id == id,
                                            news.News.user == current_user).first()
-    if new:
+    if new:  # если такая новость существует то удаляем
         sessions.delete(new)
         sessions.commit()
         for comment in sessions.query(comments.Comments).filter(
                 comments.Comments.for_topic == id).all():
             sessions.delete(comment)
             sessions.commit()
-    else:
+    else:  # иначе выбрасываем ошибку 404
         abort(404)
-    return redirect('/')
+    return redirect('/')  # возвращаем пользователя на главную страницу
 
 
-@app.route('/change_news/<int:id>', methods=['GET', 'POST'])
+@app.route('/change_news/<int:id>', methods=['GET', 'POST'])  # изменение новости
 @login_required
 def edit_news(id):
     form = NewsForm()
@@ -146,12 +155,14 @@ def edit_news(id):
         sessions = db_session.create_session()
         new = sessions.query(news.News).filter(news.News.id == id,
                                                news.News.user == current_user).first()
-        if new:
+        if new:  # проверка на существование новости
             form.title.data = new.title
-            form.text.data = new.text.replace('<br />&nbsp;&nbsp;&nbsp;', '')
+            form.text.data = new.text.replace('<br />&nbsp;&nbsp;&nbsp;', '')  # заменяем символ
+            # <br />&nbsp;&nbsp;&nbsp; на пустой чтобы на странице в браузере
+            # отображались переносы строк
             form.category.data = new.category
             form.color.data = new.color
-        else:
+        else:  # если такой нововсти нет
             abort(404)
     if form.validate_on_submit():
         sessions = db_session.create_session()
@@ -162,10 +173,11 @@ def edit_news(id):
         if new:
             new.title = form.title.data
             new.text = form.text.data
-            comment.text = form.text.data
+            comment.text = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
             new.color = form.color.data
             new.category = form.category.data
             sessions.commit()
+            # сохранение новости и комментария к нему
             return redirect('/')
         else:
             abort(404)
@@ -174,13 +186,13 @@ def edit_news(id):
                            title='Редактирование')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])  # вход на сайт
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
         user = session.query(users.User).filter(users.User.email == form.email.data).first()
-        if user and user.check_password(form.password.data):
+        if user and user.check_password(form.password.data):  # проверка на пароль
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         return render_template('login.html',
@@ -189,26 +201,26 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])  # регистрация пользователя
 def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
-        try:
+        try:  # если пользователь указал свою аватарку
             file = request.files['file']
             path = app.config['UPLOAD_FOLDER'] + file.filename
             file.save(path)
-        except PermissionError:
+        except PermissionError:  # если не указал то рандомно выбирается
             img = random.choice(['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png',
                                  'avatar5.png', 'avatar6.png', 'avatar7.png'])
             path = f"/static/img/{img}"
-        if form.password.data != form.password_again.data:
+        if form.password.data != form.password_again.data:  # если введеные пароли не совпадают
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
         session = db_session.create_session()
         if session.query(users.User).filter(
                 users.User.email == form.email.data).first() or session.query(users.User).filter(
-            users.User.nickname == form.name.data).first():
+            users.User.nickname == form.name.data).first():  # если такие никнейм занят
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
@@ -216,7 +228,7 @@ def reqister():
             nickname=form.name.data,
             email=form.email.data,
             avatar=path
-        )
+        )  # создание пользователя
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
@@ -224,32 +236,34 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route("/")
+@app.route("/")  # главная страница
 def index():
     session = db_session.create_session()
     new = session.query(news.News).all()
-    new.reverse()
-    if current_user.is_authenticated:
+    new.reverse()  # переворачиваем все новости, чтобы новые новости были сверху
+    if current_user.is_authenticated:  # если пользователь авторизован
         return render_template('forum.html', title='Todoroki', nickname=current_user.nickname,
                                image=current_user.avatar, news=new)
     return render_template('forum.html', title='Todoroki', news=new)
 
 
-@app.route("/discussion/<int:news_id>", methods=['GET', 'POST'])
+@app.route("/discussion/<int:news_id>",
+           methods=['GET', 'POST'])  # страница обсуждения темы по её id
 def discussion(news_id):
-    forum = ForumForm()
+    forum = ForumForm()  # форма для оставления комментариев
     session = db_session.create_session()
     new = session.query(news.News).filter(news.News.id == news_id).first()
     messages = forum.message.data
     if forum.validate_on_submit():
         comment = comments.Comments()
-        comment.text = messages.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
+        comment.text = messages.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')  # заменяем символ
+        # \n на <br />&nbsp;&nbsp;&nbsp; чтобы на странице в браузере отображались переносы строк
         comment.nickname = current_user.nickname
         comment.for_topic = new.id
-        comment.first_com = 'Y'
+        comment.first_com = 'N'
         session.add(comment)
         session.commit()
-    dict_com = []
+    dict_com = []  # список словарей нужен для передачи комментариев в html
     for comment in session.query(comments.Comments).filter(
             comments.Comments.for_topic == news_id).all():
         dict_com.append({'text': comment.text, 'author': comment.nickname})
@@ -260,16 +274,17 @@ def discussion(news_id):
     return render_template('discussion.html', messages=dict_com, form=forum, title=new.title,
                            category=new.category)
 
-@app.route("/<category>")
+
+@app.route("/<category>")  # сортировка тем по категориям
 def sorted_news(category):
     session = db_session.create_session()
-    if category == 'only_games':
+    if category == 'only_games':  # только темы посвященные Обсуждению игр
         new = session.query(news.News).filter(news.News.category == 'Обсуждение игр').all()
-    elif category == 'only_soft':
+    elif category == 'only_soft':  # только темы посвященные Софту
         new = session.query(news.News).filter(news.News.category == 'Софт').all()
-    elif category == 'only_halyava':
+    elif category == 'only_halyava':  # только темы посвященные Халяве
         new = session.query(news.News).filter(news.News.category == 'Халява').all()
-    else:
+    else:  # все темы
         new = session.query(news.News).filter(news.News.category == 'Новости').all()
     new.reverse()
     if current_user.is_authenticated:
@@ -279,7 +294,7 @@ def sorted_news(category):
 
 
 @login_required
-@app.route('/profile')
+@app.route('/profile')  # профиль пользователя
 def my_profile():
     return render_template('my_profile.html', title='Todoroki | Мой профиль',
                            nickname=current_user.nickname, image=current_user.avatar,
@@ -287,29 +302,31 @@ def my_profile():
 
 
 @login_required
-@app.route('/settings', methods=['GET', 'POST'])
+@app.route('/settings',
+           methods=['GET', 'POST'])  # настройки пользователя для смены почты или пароля
 def settings():
     form = SettingsForm()
     if form.validate_on_submit():
         session = db_session.create_session()
         user = session.query(users.User).filter(users.User.id == current_user.id).first()
-        if user.check_password(form.old_pass.data):
+        if user.check_password(form.old_pass.data):  # проверка чтобы старый пароль совпадал
             if form.new_pass.data == form.new_pass_again.data and form.new_pass.data != '':
+                # проверка чтобы новые пароли совпадали
                 if user:
-                    user.set_password(form.new_pass.data)
+                    user.set_password(form.new_pass.data)  # меняем пароль
                     session.commit()
                     return redirect('/')
                 else:
                     abort(404)
-            elif current_user.email != form.email.data:
+            elif current_user.email != form.email.data:  # если старая почта была изменена
                 user.email = form.email.data
                 session.commit()
                 return redirect('/')
-            else:
+            else:  # если новые пароли не совпали
                 return render_template('settings.html',
                                        nickname=current_user.nickname, image=current_user.avatar,
                                        form=form, message='Пароли не совпадают')
-        else:
+        else:  # если старый пароль не совпадает
             return render_template('settings.html',
                                    nickname=current_user.nickname, image=current_user.avatar,
                                    form=form, message='Неверный пароль')
@@ -318,7 +335,7 @@ def settings():
 
 
 @login_required
-@app.route('/add_item', methods=['POST', 'GET'])
+@app.route('/add_item', methods=['POST', 'GET'])  # размещение аккаунта
 def add_item():
     form = SaleForm()
     if form.validate_on_submit():
@@ -329,15 +346,15 @@ def add_item():
         acc.type = form.category.data
         acc.price = form.price.data
         acc.user_name = current_user.nickname
-        try:
+        try:  # попытка изменения ссылки
             acc.vk_silka = vk_changed_ssilka(form.contact_info.data)
-        except TypeError:
+        except TypeError:  # если введенная ссылка неправильная
             return render_template('add_item.html', form=form, message='Неверная ссылка!')
         session.add(acc)
         session.commit()
         items = session.query(accounts.Accounts).all()
-        item_list = {}
-        for item in items:
+        item_list = {}  # словарь для товаров
+        for item in items:  # получение всех товаров, чтобы разместить на странице
             item_list[item.title] = [item.price, item.count, item.vk_silka, item.user_name,
                                      item.type, item.id, item.user_name]
         if current_user.is_authenticated:
@@ -353,12 +370,12 @@ def add_item():
     return render_template('add_item.html', form=form)
 
 
-@app.route('/market', methods=['POST', 'GET'])
+@app.route('/market', methods=['POST', 'GET'])  # страница маркета
 def market():
     session = db_session.create_session()
     items = session.query(accounts.Accounts).all()
-    item_list = {}
-    for item in items:
+    item_list = {}  # словарь для товаров
+    for item in items:  # получение всех товаров, чтобы разместить на странице
         item_list[item.title] = [item.price, item.count, item.vk_silka, item.user_name,
                                  item.type, item.id, item.user_name]
     if current_user.is_authenticated:
@@ -368,33 +385,33 @@ def market():
     return render_template('market.html', item_list=item_list)
 
 
-@app.route('/delete_item/<int:id>', methods=['GET', 'POST'])
+@app.route('/delete_item/<int:id>', methods=['GET', 'POST'])  # удаление аккаунта по id
 @login_required
 def item_delete(id):
     sessions = db_session.create_session()
     item = sessions.query(accounts.Accounts).filter(accounts.Accounts.id == id).first()
-    if item:
+    if item:  # проверка на существование аккаунта
         sessions.delete(item)
         sessions.commit()
-    else:
+    else:  # если такого аккаунта нет, то выбрасываем ошибку 404
         abort(404)
     return redirect('/market')
 
 
-@app.route('/change_item/<int:id>', methods=['GET', 'POST'])
+@app.route('/change_item/<int:id>', methods=['GET', 'POST'])  # изменение аккаунта по его id
 @login_required
 def edit_item(id):
     form = SaleForm()
     if request.method == 'GET':
         sessions = db_session.create_session()
         item = sessions.query(accounts.Accounts).filter(accounts.Accounts.id == id).first()
-        if item:
+        if item:  # проверка на существование аккаунта
             form.name.data = item.title
             form.category.data = item.type
             form.contact_info.data = old_ssika(item.vk_silka)
             form.price.data = item.price
             form.count.data = item.count
-        else:
+        else:  # если такого аккаунта нет, то выбрасываем ошибку 404
             abort(404)
     if form.validate_on_submit():
         sessions = db_session.create_session()
@@ -413,19 +430,21 @@ def edit_item(id):
                            nickname=current_user.nickname, image=current_user.avatar)
 
 
-@app.route('/market/<category>', methods=['POST', 'GET'])
+@app.route('/market/<category>', methods=['POST', 'GET'])  # сортировка аккаунтов
 def sorted_market(category):
     session = db_session.create_session()
-    if category == 'vk':
+    if category == 'vk':  # только аккаунты ВК
         items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'ВК')
-    elif category == 'telegram':
+    elif category == 'telegram':  # только аккаунты Telegram
         items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'Telegram')
-    elif category == 'steam':
+    elif category == 'steam':  # только аккаунты Steam
         items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'Steam')
-    elif category == 'instagram':
+    elif category == 'instagram':  # только аккаунты Instagram
         items = session.query(accounts.Accounts).filter(accounts.Accounts.type == 'Instagram')
-    item_list = {}
-    for item in items:
+    else:  # все аккаунты
+        items = session.query(accounts.Accounts).all()
+    item_list = {}  # словарь для товаров
+    for item in items:  # получение всех товаров, чтобы разместить на странице
         item_list[item.title] = [item.price, item.count, item.vk_silka, item.user_name,
                                  item.type, item.id, item.user_name]
     if current_user.is_authenticated:
@@ -435,24 +454,24 @@ def sorted_market(category):
     return render_template('market.html', item_list=item_list)
 
 
-@app.route('/about')
+@app.route('/about')  # страница О нас
 def about():
     map_request = "https://static-maps.yandex.ru/1.x/" \
-                  "?ll=40.692507%2C55.614970&z=17&l=map&pt=40.692075%2C55.614979"
+                  "?ll=40.692507%2C55.614970&z=17&l=map&pt=40.692075%2C55.614979"  # гео запрос
     response = requests.get(map_request)
-    map_file = "static/img/map.png"
+    map_file = "static/img/map.png"  # путь куда сохранять карту
     with open(map_file, "wb") as file:
-        file.write(response.content)
+        file.write(response.content)  # получение карты наших координат
     if current_user.is_authenticated:
         return render_template('about.html', nickname=current_user.nickname,
                                image=current_user.avatar, filename=map_file)
     return render_template('about.html', filename=map_file)
 
 
-def main():
-    db_session.global_init("db/blogs.sqlite")
-    app.run(port=1414, host='127.0.0.1')
+def main():  # главная функция запускающая наше приложение
+    db_session.global_init("db/blogs.sqlite")  # иницилизация БД
+    app.run(port=1414, host='127.0.0.1')  # запуск приложения
 
 
 if __name__ == '__main__':
-    main()
+    main()  # запуск главной функции

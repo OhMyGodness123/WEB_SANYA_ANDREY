@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<div class="contentss">
-    <div style="display: flex">
-    <img src={{ image }}>
+<div class="contentss" style="margin-left: 15%">
+    <div style="display: flex" >
+    <img src={{ image }} style="width: 160px; height: 160px;">
         <div style="margin-left: 5%">
-            <h3 style="color: white"> {{ nickname }} </h3>
+            <h2 style="color: white"> {{ nickname }} </h2><br>
             <h4 style="color: white">Почта: {{ mail }}</h4>
             <h4 style="color: white">Дата регистрации: {{ created_date }}</h4>
         </div>
