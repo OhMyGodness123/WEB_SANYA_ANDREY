@@ -9,6 +9,8 @@ from data import db_session, news, users, accounts, comments
 import random
 import json
 import requests
+from flask_restful import reqparse, abort, Api, Resource
+import Api_news
 
 # подключение библиотек и функций
 
@@ -16,8 +18,9 @@ app = Flask(__name__)  # создание приложения
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # создание ключа
 login_manager = LoginManager()
 login_manager.init_app(app)
-UPLOAD_FOLDER = '/static/img/'  # путь для сохранения картинок
+UPLOAD_FOLDER = 'static/img/'  # путь для сохранения картинок
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  # путь для сохранения картинок
+api = Api(app)
 
 
 @login_manager.user_loader
@@ -212,7 +215,7 @@ def reqister():
         except PermissionError:  # если не указал то рандомно выбирается
             img = random.choice(['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png',
                                  'avatar5.png', 'avatar6.png', 'avatar7.png'])
-            path = f"/static/img/{img}"
+            path = f"static/img/{img}"
         if form.password.data != form.password_again.data:  # если введеные пароли не совпадают
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -470,6 +473,7 @@ def about():
 
 def main():  # главная функция запускающая наше приложение
     db_session.global_init("db/blogs.sqlite")  # иницилизация БД
+    api.add_resource(Api_news.NewsListResource, '/api/v1/news') # иницилизация API    api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
     app.run(port=1414, host='127.0.0.1')  # запуск приложения
 
 
