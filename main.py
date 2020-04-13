@@ -9,6 +9,7 @@ from data import db_session, news, users, accounts, comments
 import random
 import requests
 from flask_restful import reqparse, abort, Api, Resource
+import bbcodepy
 import Api_news
 
 # подключение библиотек и функций
@@ -63,13 +64,13 @@ class LoginForm(FlaskForm):  # класс формы авторизации
 
 
 class ForumForm(FlaskForm):  # класс формы обсуждения
-    message = TextAreaField('Введите своё сообщение:', [validators.Length(min=4, max=10000)])
+    message = TextAreaField('Введите своё сообщение:', [validators.Length(min=4)])
     submit = SubmitField('Отправить')
 
 
 class NewsForm(FlaskForm):  # класс формы создания новости
     title = StringField('Заголовок:', [validators.Length(min=4, max=166)])
-    text = TextAreaField('Содержание:', [validators.Length(min=2, max=10000)])
+    text = TextAreaField('Содержание:', [validators.Length(min=2)])
     color = StringField('Цвет новости: #')
     category = SelectField('Категория',
                            choices=[('Новости', 'Новости'), ('Софт', 'Софт'), ('Халява', 'Халява'),
@@ -100,9 +101,7 @@ def add_news():
         sessions = db_session.create_session()
         new = news.News()
         new.title = form.title.data
-        text2 = form.text.data.replace('\n',
-                                       '<br />&nbsp;&nbsp;&nbsp;')  # заменяем символ
-        # \n на <br />&nbsp;&nbsp;&nbsp; чтобы на странице в браузере отображались переносы строк
+        text2 = form.text.data
 
         new.text = text2
         new.creator = current_user.nickname
@@ -117,7 +116,7 @@ def add_news():
         new = sessions.query(news.News).filter(news.News.text == text2).first()
 
         comment = comments.Comments()
-        comment.text = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
+        comment.text = form.text.data
         comment.nickname = current_user.nickname
         comment.for_topic = new.id
         comment.first_com = 'Y'
@@ -159,9 +158,7 @@ def edit_news(id):
                                                news.News.user == current_user).first()
         if new:  # проверка на существование новости
             form.title.data = new.title
-            form.text.data = new.text.replace('<br />&nbsp;&nbsp;&nbsp;', '')  # заменяем символ
-            # <br />&nbsp;&nbsp;&nbsp; на пустой чтобы на странице в браузере
-            # отображались переносы строк
+            form.text.data = new.text
             form.category.data = new.category
             form.color.data = new.color
         else:  # если такой нововсти нет
@@ -175,7 +172,7 @@ def edit_news(id):
         if new:
             new.title = form.title.data
             new.text = form.text.data
-            comment.text = form.text.data.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')
+            comment.text = form.text.data
             new.color = form.color.data
             new.category = form.category.data
             sessions.commit()
@@ -209,9 +206,9 @@ def reqister():
     if form.validate_on_submit():
         try:  # если пользователь указал свою аватарку
             file = request.files['file']
-            path = '/' + app.config['UPLOAD_FOLDER'] + file.filename
+            path = app.config['UPLOAD_FOLDER'] + file.filename
             file.save(path)
-        except PermissionError:  # если не указал то рандомно выбирается
+        except Exception:  # если не указал то рандомно выбирается
             img = random.choice(['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png',
                                  'avatar5.png', 'avatar6.png', 'avatar7.png'])
             path = f"static/img/{img}"
@@ -229,7 +226,7 @@ def reqister():
         user = users.User(
             nickname=form.name.data,
             email=form.email.data,
-            avatar=path
+            avatar='/' + path
         )  # создание пользователя
         user.set_password(form.password.data)
         session.add(user)
@@ -258,8 +255,7 @@ def discussion(news_id):
     messages = forum.message.data
     if forum.validate_on_submit():
         comment = comments.Comments()
-        comment.text = messages.replace('\n', '<br />&nbsp;&nbsp;&nbsp;')  # заменяем символ
-        # \n на <br />&nbsp;&nbsp;&nbsp; чтобы на странице в браузере отображались переносы строк
+        comment.text = messages
         comment.nickname = current_user.nickname
         comment.for_topic = new.id
         comment.first_com = 'N'
@@ -268,7 +264,8 @@ def discussion(news_id):
     dict_com = []  # список словарей нужен для передачи комментариев в html
     for comment in session.query(comments.Comments).filter(
             comments.Comments.for_topic == news_id).all():
-        dict_com.append({'text': comment.text, 'author': comment.nickname})
+        dict_com.append(
+            {'text': bbcodepy.Parser().to_html(comment.text), 'author': comment.nickname})
     if current_user.is_authenticated:
         return render_template('discussion.html', nickname=current_user.nickname,
                                image=current_user.avatar, messages=dict_com, form=forum,
@@ -472,9 +469,9 @@ def about():
 
 def main():  # главная функция запускающая наше приложение
     db_session.global_init("db/blogs.sqlite")  # иницилизация БД
-    api.add_resource(Api_news.NewsListResource, '/api/v1/news') # иницилизация API
+    api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
     api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-    app.run(port=1414, host='127.0.0.1')  # запуск приложения
+    app.run(port=12, host='127.0.0.1')  # запуск приложения
 
 
 if __name__ == '__main__':
