@@ -1,4 +1,4 @@
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import reqparse, abort, Resource, Api
 from data import db_session, news
 from flask import jsonify
 

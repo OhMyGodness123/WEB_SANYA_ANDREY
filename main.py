@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, make_response, session, abort, jsonify
+from flask import Flask, render_template, redirect, request, make_response, abort, jsonify
 from flask_wtf import FlaskForm
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField, \
@@ -7,7 +7,6 @@ from wtforms import validators
 from vk_user_id import vk_changed_ssilka, old_ssika
 from data import db_session, news, users, accounts, comments
 import random
-import json
 import requests
 from flask_restful import reqparse, abort, Api, Resource
 import Api_news
@@ -210,7 +209,7 @@ def reqister():
     if form.validate_on_submit():
         try:  # если пользователь указал свою аватарку
             file = request.files['file']
-            path = app.config['UPLOAD_FOLDER'] + file.filename
+            path = '/' + app.config['UPLOAD_FOLDER'] + file.filename
             file.save(path)
         except PermissionError:  # если не указал то рандомно выбирается
             img = random.choice(['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png',
@@ -457,7 +456,7 @@ def sorted_market(category):
     return render_template('market.html', item_list=item_list)
 
 
-@app.route('/about')  # страница О нас
+@app.route('/about')  # страница контактов
 def about():
     map_request = "https://static-maps.yandex.ru/1.x/" \
                   "?ll=40.692507%2C55.614970&z=17&l=map&pt=40.692075%2C55.614979"  # гео запрос
