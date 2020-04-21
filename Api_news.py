@@ -1,5 +1,5 @@
 from flask_restful import reqparse, abort, Resource, Api
-from data import db_session, news
+from data import db_session, news, comments
 from flask import jsonify
 
 
@@ -56,6 +56,8 @@ class NewsListResource(Resource):
             date_of_create=args['date_of_create'],
             category=args['category']
         )
+        comm = comments.Comments(text=args['text'], nickname=args['creator'], for_topic=args['id'])
         session.add(new)
+        session.add(comm)
         session.commit()
         return jsonify({'success': 'OK'})
