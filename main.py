@@ -134,8 +134,7 @@ def add_news():
 @login_required
 def news_delete(id):
     sessions = db_session.create_session()
-    new = sessions.query(news.News).filter(news.News.id == id,
-                                           news.News.user == current_user).first()
+    new = sessions.query(news.News).filter(news.News.id == id).first()
     if new:  # если такая новость существует то удаляем
         sessions.delete(new)
         sessions.commit()
@@ -154,8 +153,7 @@ def edit_news(id):
     form = NewsForm()
     if request.method == 'GET':
         sessions = db_session.create_session()
-        new = sessions.query(news.News).filter(news.News.id == id,
-                                               news.News.user == current_user).first()
+        new = sessions.query(news.News).filter(news.News.id == id).first()
         if new:  # проверка на существование новости
             form.title.data = new.title
             form.text.data = new.text
@@ -165,10 +163,10 @@ def edit_news(id):
             abort(404)
     if form.validate_on_submit():
         sessions = db_session.create_session()
-        new = sessions.query(news.News).filter(news.News.id == id,
-                                               news.News.user == current_user).first()
+        new = sessions.query(news.News).filter(news.News.id == id).first()
         comment = sessions.query(comments.Comments).filter(comments.Comments.for_topic == id,
-                                                           comments.Comments.first_com == 'Y').first()
+                                                           comments.Comments.first_com ==
+                                                           'Y').first()
         if new:
             new.title = form.title.data
             new.text = form.text.data
