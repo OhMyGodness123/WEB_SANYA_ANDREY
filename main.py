@@ -465,12 +465,10 @@ def about():
     return render_template('about.html', filename=map_file)
 
 
-def main():  # главная функция запускающая наше приложение
-    db_session.global_init("db/blogs.sqlite")  # иницилизация БД
-    api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
-    api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-    app.run()  # запуск приложения
+db_session.global_init("db/blogs.sqlite")  # иницилизация БД
+api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
+api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
+app.run()  # запуск приложения
 
 
-if __name__ == '__main__':
-    main()  # запуск главной функции
+
