@@ -2,6 +2,7 @@ flask
 flask_login
 requests
 flask_restful
+sqlalchemy
 bbcodepy
 vk
 flask-wtf
