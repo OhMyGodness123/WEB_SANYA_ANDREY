@@ -469,7 +469,7 @@ def main():  # главная функция запускающая наше п�
     db_session.global_init("db/blogs.sqlite")  # иницилизация БД
     api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
     api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-    app.run(port=12, host='127.0.0.1')  # запуск приложения
+    app.run()  # запуск приложения
 
 
 if __name__ == '__main__':
