@@ -4,4 +4,5 @@ requests
 flask_restful
 bbcodepy
 vk
+flask-wtf
 vk_api
