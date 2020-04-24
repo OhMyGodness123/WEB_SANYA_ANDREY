@@ -7,4 +7,5 @@ bbcodepy
 vk
 sqlalchemy_serializer
 flask-wtf
+wtforms
 vk_api
