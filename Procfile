@@ -1,1 +1,1 @@
-web: python main.py, VK_BOT.py
+web: python main.py
