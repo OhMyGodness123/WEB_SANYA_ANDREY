@@ -453,7 +453,7 @@ def sorted_market(category):
 
 @app.route('/about')  # страница контактов
 def about():
-    map_request = "https://static-maps.yandex.ru/1.x/" \
+    map_request = "https://static-maps.yandex.ru/1.x/" \    
                   "?ll=40.692507%2C55.614970&z=17&l=map&pt=40.692075%2C55.614979"  # гео запрос
     response = requests.get(map_request)
     map_file = "static/img/map.png"  # путь куда сохранять карту
