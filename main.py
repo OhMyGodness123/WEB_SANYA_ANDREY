@@ -20,6 +20,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 UPLOAD_FOLDER = 'static/img/'  # путь для сохранения картинок
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  # путь для сохранения картинок
+db_session.global_init("db/blogs.sqlite")  # иницилизация БД
 api = Api(app)
 
 
@@ -464,10 +465,11 @@ def about():
     return render_template('about.html', filename=map_file)
 
 
-db_session.global_init("db/blogs.sqlite")  # иницилизация БД
-api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
-api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-app.run()  # запуск приложения
+def main():
+    api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
+    api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
+    app.run()  # запуск приложения
 
 
-
+if __name__ == '__main__':
+    main()
