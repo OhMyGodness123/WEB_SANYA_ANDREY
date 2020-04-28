@@ -8,19 +8,21 @@ from vk_user_id import vk_changed_ssilka, old_ssika
 from data import db_session, news, users, accounts, comments
 import random
 import requests
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import abort, Api
 import bbcodepy
 import Api_news
+from flask_ngrok import run_with_ngrok
 
 # подключение библиотек и функций
 
+
 app = Flask(__name__)  # создание приложения
+run_with_ngrok(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # создание ключа
 login_manager = LoginManager()
 login_manager.init_app(app)
 UPLOAD_FOLDER = 'static/img/'  # путь для сохранения картинок
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER  # путь для сохранения картинок
-db_session.global_init("db/blogs.sqlite")  # иницилизация БД
 api = Api(app)
 
 
@@ -454,7 +456,8 @@ def sorted_market(category):
 
 @app.route('/about')  # страница контактов
 def about():
-    map_request = "https://static-maps.yandex.ru/1.x/?ll=40.692507%2C55.614970&z=17&l=map&pt=40.692075%2C55.614979"  # гео запрос
+    map_request = "https://static-maps.yandex.ru/1.x/?ll=40.692507%2C55.614970&z=17&l" \
+                  "=map&pt=40.692075%2C55.614979"  # гео запрос
     response = requests.get(map_request)
     map_file = "static/img/map.png"  # путь куда сохранять карту
     with open(map_file, "wb") as file:
@@ -465,11 +468,7 @@ def about():
     return render_template('about.html', filename=map_file)
 
 
-def main():
-    api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
-    api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-    app.run()  # запуск приложения
-
-
-if __name__ == '__main__':
-    main()
+db_session.global_init("db/blogs.sqlite")  # иницилизация БД
+api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
+api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
+app.run()  # запуск приложения
