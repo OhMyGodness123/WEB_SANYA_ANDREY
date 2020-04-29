@@ -7,6 +7,8 @@ def vk_changed_ssilka(user_id):
     v = '5.00'
     session = vk.Session(access_token=access_token)
     api = vk.API(session, v=v)
+    if 'vk' not in user_id:
+        raise TypeError
     screen_name = user_id
     try:
         id = api.utils.resolveScreenName(screen_name=screen_name)['object_id']

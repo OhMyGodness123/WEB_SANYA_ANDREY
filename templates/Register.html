@@ -19,7 +19,7 @@
                 {{ form.password.label }}<br>
                 {{ form.password(class="form-control", type="password", style="width: 300px;") }}<br>
                 {% for error in form.password.errors %}
-                    <p class="alert alert-danger" role="alert" style="width: 300px;">
+                    <p style="color: red">
                         {{ error }}
                     </p>
                 {% endfor %}
@@ -44,8 +44,10 @@
             </p>
             <p style="color: white;">Загрузите аватарку</p>
              <p><input type="file" class="form-control-file" id="photo" name="file" style="color: white;"></p>
-            <p>{{ form.submit(type="submit", class="btn btn-outline-success") }}</p>
-            <div style="color: red">{{message}}</div>
+            <p>{{ form.submit(type="submit", class="btn btn-success") }}</p>
+           {% if message|length > 1 %}
+             <div class="alert alert-danger" style="max-width: 300px">{{message}}</div>
+            {% endif %}
         </form>
 </div>
 {% endblock %}

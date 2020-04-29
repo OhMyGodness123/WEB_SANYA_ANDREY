@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    background-color: #131d63;
+    background-color: #7f8ce9;
     font-family: 'Open Sans', sans-serif;
     font-weight: 80px;
 }
@@ -12,9 +12,7 @@ body {
 
 .logo {
     float: left;
-    height: 70px;
-    padding-top: 30px;
-    padding-left: 60px;
+    height: 50px;
 }
 
 header {
@@ -24,28 +22,6 @@ header {
     height: 90px
 }
 
-nav {
-        float: right;
-}
-
-nav ul {
-    margin: 0;
-    list-style: none;
-    padding-right: 140px;
-}
-
-nav li {
-    display: inline-block;
-    margin-left: 80px;
-
-}
-
-nav a {
-    color: #05f;
-    text-decoration: none;
-    font-size: 25px;
-    font-weight: bold
-}
 
 .market {
     color: #05f;
@@ -128,7 +104,7 @@ nav a {
   padding-top: 10px;
   padding-bottom: 50px;
   background-color: black;
-  margin-left: 17%;
+  margin-left: 20%;
   border-radius: 7px;
   margin-top: 20px;
   padding-left: 5%;
@@ -154,7 +130,7 @@ nav a {
   padding-bottom: 50px;
   background-color: black;
   color: white;
-  margin-left: 4%;
+  margin-left: 7%;
   list-style: none;
   border-radius: 7px;
   margin-top: 20px;

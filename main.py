@@ -17,7 +17,6 @@ from flask_ngrok import run_with_ngrok
 
 
 app = Flask(__name__)  # создание приложения
-run_with_ngrok(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # создание ключа
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -39,9 +38,9 @@ def not_found(error):
 
 class RegisterForm(FlaskForm):  # класс формы регистрации
     email = StringField('Почта', [validators.Email()])
-    password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
-    password_again = PasswordField('Повторите пароль', [validators.Length(min=5, max=30)])
-    name = StringField('Имя пользователя', [validators.Length(min=5, max=30)])
+    password = PasswordField('Пароль')
+    password_again = PasswordField('Повторите пароль')
+    name = StringField('Имя пользователя')
     submit = SubmitField('Зарегистрироваться')
 
 
@@ -60,14 +59,14 @@ class SaleForm(FlaskForm):  # класс формы продажи аккаун�
 
 
 class LoginForm(FlaskForm):  # класс формы авторизации
-    email = StringField('Почта', [validators.Email()])
-    password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
+    email = StringField('Почта')
+    password = PasswordField('Пароль')
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 
 class ForumForm(FlaskForm):  # класс формы обсуждения
-    message = TextAreaField('Введите своё сообщение:', [validators.Length(min=4)])
+    message = TextAreaField('Введите своё сообщение:')
     submit = SubmitField('Отправить')
 
 
@@ -82,7 +81,7 @@ class NewsForm(FlaskForm):  # класс формы создания новос�
 
 
 class SettingsForm(FlaskForm):  # класс формы настроек
-    email = StringField('Почта')
+    email = StringField('Почта', [validators.Email()])
     old_pass = PasswordField('Старый пароль')
     new_pass = PasswordField('Новый пароль', [validators.Length(min=5, max=155)])
     new_pass_again = PasswordField('Подтвердите новый пароль')
@@ -170,7 +169,22 @@ def edit_news(id):
         comment = sessions.query(comments.Comments).filter(comments.Comments.for_topic == id,
                                                            comments.Comments.first_com ==
                                                            'Y').first()
-        if new:
+        # нахождение первого комментария для его изменения
+
+        if new:  # если новость сформулированна
+            if len(new.title) <= 5:  # проверка длины заголовка
+                return render_template('add_news.html', form=form,
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       title='Редактирование', message='Пожалуйста,'
+                                                                       ' сформулируйте заголовок'
+                                                                       ' темы более подробно')
+            if len(new.text) <= 15:  # проверка длины текста темы
+                return render_template('add_news.html', form=form,
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       title='Редактирование', message='Пожалуйста,'
+                                                                       ' сформулируйте ваш'
+                                                                       ' текст более подробно'
+                                                                       ' (Более 15 знаков)')
             new.title = form.title.data
             new.text = form.text.data
             comment.text = form.text.data
@@ -195,9 +209,14 @@ def login():
         if user and user.check_password(form.password.data):  # проверка на пароль
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        return render_template('login.html',
-                               message="Неправильный логин или пароль",
-                               form=form)
+        elif user:  # проверка существует ли вообще этот пользователь
+            return render_template('login.html',
+                                   message="Неправильный логин или пароль",
+                                   form=form)
+        else:
+            return render_template('login.html',
+                                   message="Такого пользователя не существует",
+                                   form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 
@@ -224,6 +243,15 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
+        if len(form.password.data) <= 5:  # проверка на длину пароля
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Вы ввели слишком простой пароль. \n\n\n"
+                                           "Длина хорошего пароля больше 5 символов")
+        if len(form.name.data) <= 3:  # проверка на длину логина
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Вы ввели слишком короткое имя пользователя")
         user = users.User(
             nickname=form.name.data,
             email=form.email.data,
@@ -252,21 +280,30 @@ def index():
 def discussion(news_id):
     forum = ForumForm()  # форма для оставления комментариев
     session = db_session.create_session()
+    dict_com = []  # список словарей нужен для передачи комментариев в html
+    for comment in session.query(comments.Comments).filter(
+            comments.Comments.for_topic == news_id).all():
+        dict_com.append(
+            {'text': bbcodepy.Parser().to_html(comment.text), 'author': comment.nickname})
     new = session.query(news.News).filter(news.News.id == news_id).first()
     messages = forum.message.data
     if forum.validate_on_submit():
         comment = comments.Comments()
+        if len(messages) <= 4:  # проверяем длину комментария
+            return render_template('discussion.html', nickname=current_user.nickname,
+                                   image=current_user.avatar, messages=dict_com, form=forum,
+                                   title=new.title, category=new.category,
+                                   message='Сформулируйте, свой комментарий более подробно')
         comment.text = messages
         comment.nickname = current_user.nickname
         comment.for_topic = new.id
         comment.first_com = 'N'
         session.add(comment)
         session.commit()
-    dict_com = []  # список словарей нужен для передачи комментариев в html
-    for comment in session.query(comments.Comments).filter(
-            comments.Comments.for_topic == news_id).all():
         dict_com.append(
             {'text': bbcodepy.Parser().to_html(comment.text), 'author': comment.nickname})
+        # добавляем новый комментарий
+
     if current_user.is_authenticated:
         return render_template('discussion.html', nickname=current_user.nickname,
                                image=current_user.avatar, messages=dict_com, form=forum,
@@ -348,7 +385,7 @@ def add_item():
         acc.user_name = current_user.nickname
         try:  # попытка изменения ссылки
             acc.vk_silka = vk_changed_ssilka(form.contact_info.data)
-        except TypeError:  # если введенная ссылка неправильная
+        except Exception:  # если введенная ссылка неправильная
             return render_template('add_item.html', form=form, message='Неверная ссылка!')
         session.add(acc)
         session.commit()
@@ -471,4 +508,4 @@ def about():
 db_session.global_init("db/blogs.sqlite")  # иницилизация БД
 api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
 api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-app.run()  # запуск приложения
+app.run(port=8211, host='127.0.0.1')  # запуск приложения
