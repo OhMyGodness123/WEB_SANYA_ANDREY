@@ -30,12 +30,13 @@
         </div>
         {% endfor %}
         </p>
-        <p style="color: white">{{ form.submit(type="submit", class="btn btn-outline-warning")
-            }}</p>
+        <p style="color: white">{{ form.submit(type="submit", class="btn btn-outline-warning")}}</p>
     </form>
     {% else %}
-        <span style="color: red">Только зарегистрированные пользователи могут оставлять свои комментарии</span>
+        <div class="alert alert-danger" style="max-width: 800px">Только зарегистрированные пользователи могут оставлять свои комментарии</div>
     {% endif %}
-    <p style="color: red">{{ message }}</p>
+        {% if message|length > 1 %}
+             <div class="alert alert-danger" style="max-width: 800px">{{message}}</div>
+    {% endif %}
 </div>
 {% endblock %}

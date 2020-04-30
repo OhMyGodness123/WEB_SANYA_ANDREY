@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="margin-left: 25%">
+<div class="sale">
     <h1 class="login-text"
-        style="color: white; margin-left: 20%; margin-top: 40px; text-shadow: 0 0 5px #ffffff,
+        style="color: white; margin-top: 40px; text-shadow: 0 0 5px #ffffff,
          0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 40px #ff00de, 0 0 80px #ff00de,
-          0 0 90px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de">
+          0 0 90px #ff00de, 0 0 100px #ff00de, 0 0 150px #ff00de; text-align: center;">
         {{ title }}</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {{ form.csrf_token }}
         <p style="margin-top: 30px;">
             {{ form.title.label(style="color: white") }}<br>
-            {{ form.title(class="form-control", style="width: 900px") }}<br>
+            {{ form.title(class="form-control", style="max-width: 1000; width: 100") }}<br>
             {% for error in form.title.errors %}
         <p  style="color: red">
             {{ error }}
@@ -21,7 +21,7 @@
         </p>
         <p>
             {{ form.text.label(style="color: white") }}<br>
-            {{ form.text(class="form-control", style="width: 900px; height: 200px;") }}<br>
+            {{ form.text(class="form-control", style="max-width: 1000; width: 100; height: 200px;") }}<br>
             {% for error in form.text.errors %}
         <p  style="color: red">
             {{ error }}
@@ -30,7 +30,7 @@
         </p>
         <p>
             {{ form.category.label(style="color: white") }}<br>
-            {{ form.category(class="form-control", style="width: 900px") }}<br>
+            {{ form.category(class="form-control", style="max-width: 1000; width: 100") }}<br>
             {% for error in form.category.errors %}
         <p style="color: red">
             {{ error }}
@@ -39,17 +39,17 @@
         </p>
         <p>
             {{ form.color.label(style="color: white") }}<br>
-            {{ form.color(class="form-control", style="width: 900px") }}<br>
+            {{ form.color(class="form-control", style="max-width: 1000; width: 100") }}<br>
             {% for error in form.color.errors %}
         <p style="color: red">
             {{ error }}
         </p>
         {% endfor %}
         </p>
-        <p>{{ form.submit(type="submit", class="btn btn-success", style="width: 160px;") }}</p>
-        <p style="color: red">
-            {{ message }}
-        </p>
+        <p>{{ form.submit(type="submit", class="btn btn-success", style="width: 200px; margin-left: 40%") }}</p>
+           {% if message|length > 1 %}
+             <div class="alert alert-danger" style="max-width: 800px">{{message}}</div>
+            {% endif %}
     </form>
 </div>
 {% endblock %}

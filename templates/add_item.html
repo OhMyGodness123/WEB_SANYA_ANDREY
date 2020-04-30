@@ -57,9 +57,9 @@
 
 
             <p>{{ form.submit(type="submit", class="btn btn-success") }}</p>
-             <p style="color: red">
-            {{ message }}
-            </p>
+                  {% if message|length > 1 %}
+             <div class="alert alert-danger" style="max-width: 800px">{{message}}</div>
+            {% endif %}
         </form>
     </div>
 {% endblock %}

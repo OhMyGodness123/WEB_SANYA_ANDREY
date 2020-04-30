@@ -1,20 +1,35 @@
-import vk
+import vk_api
 
 
 def vk_changed_ssilka(user_id):
-    user_id = user_id.split('/')[-1]
-    access_token = '362847a543e3b224bc93c5546ae46d7d49184c0089d4827e66bee971260bbc2345cf7c1e5ea86760c5bea'
-    v = '5.00'
-    session = vk.Session(access_token=access_token)
-    api = vk.API(session, v=v)
-    if 'vk' not in user_id:
-        raise TypeError
-    screen_name = user_id
+    login, password = '77713753075', 'YURA2000'
+    vk_session = vk_api.VkApi(
+        login, password,  captcha_handler=captcha_handler
+    )
     try:
-        id = api.utils.resolveScreenName(screen_name=screen_name)['object_id']
-    except TypeError:
-        return f'https://vk.com/im?sel={user_id.split("/")[-1]}'
-    return f'https://vk.com/im?sel={id}'
+        vk_session.auth()
+    except vk_api.AuthError as error_msg:
+        print(error_msg)
+        return
+    vk = vk_session.get_api()
+    try:
+        user_id = user_id.split('/')[-1]
+        response = vk.users.get(user_ids=user_id)[0]['id']
+        return f'https://vk.com/im?sel={response}'
+    except Exception:
+        return 'error'
+
+
+def captcha_handler(captcha):
+    """ При возникновении капчи вызывается эта функция и ей передается объект
+        капчи. Через метод get_url можно получить ссылку на изображение.
+        Через метод try_again можно попытаться отправить запрос с кодом капчи
+    """
+
+    key = input("Enter captcha code {0}: ".format(captcha.get_url())).strip()
+
+    # Пробуем снова отправить запрос с капчей
+    return captcha.try_again(key)
 
 
 def old_ssika(user_ssilka):
