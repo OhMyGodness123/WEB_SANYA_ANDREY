@@ -11,13 +11,11 @@ import requests
 from flask_restful import abort, Api
 import bbcodepy
 import Api_news
-from flask_ngrok import run_with_ngrok
 
 # подключение библиотек и функций
 
 
 app = Flask(__name__)  # создание приложения
-run_with_ngrok(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # создание ключа
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -570,7 +568,7 @@ def main():
     db_session.global_init("db/blogs.sqlite")  # иницилизация БД
     api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
     api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-    app.run(port=12, host='127.0.0.1')
+    app.run(port=122, host='127.0.0.1')
 
 
 if __name__ == '__main__':
