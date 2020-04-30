@@ -568,7 +568,7 @@ def main():
     db_session.global_init("db/blogs.sqlite")  # иницилизация БД
     api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
     api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-    app.run(port=122, host='127.0.0.1')
+    app.run()
 
 
 if __name__ == '__main__':
