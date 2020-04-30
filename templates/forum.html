@@ -4,13 +4,13 @@
     <div class="themes">
         <ul>
             {% if current_user.is_authenticated %}
-                <a href="/news"><button type="button" class="btn btn-outline-success" style="margin-bottom: 30px;">Создать тему</button></a>
+                <a href="/news"><button type="button" class="btn btn-success" style="margin-bottom: 30px;">Создать тему</button></a>
             {% endif %}
-            <li><a href="/">Все новости</a></li>
-            <li><a href="/only_news">Новости</a></li>
-            <li><a href="/only_soft">Софт</a></li>
-            <li><a href="/only_halyava">Халява</a></li>
-            <li><a href="/only_games">Обсуждение игр</a></li>
+            <li><a href="/" style="color: white;">Всё про всё</a></li>
+            <li><a href="/only_news" style="color: white;">Новости</a></li>
+            <li><a href="/only_soft" style="color: white;">Софт</a></li>
+            <li><a href="/only_halyava" style="color: white;">Халява</a></li>
+            <li><a href="/only_games" style="color: white;">Обсуждение игр</a></li>
         </ul>
     </div>
 

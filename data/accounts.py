@@ -4,7 +4,7 @@ from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 
 
-class Accounts(SqlAlchemyBase, UserMixin, SerializerMixin):
+class Accounts(SqlAlchemyBase, UserMixin, SerializerMixin):  # класс товаров в маркете
     __tablename__ = 'accounts'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True)
     title = sqlalchemy.Column(sqlalchemy.String)

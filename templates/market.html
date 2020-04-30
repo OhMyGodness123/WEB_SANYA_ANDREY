@@ -6,7 +6,7 @@
         {% if current_user.is_authenticated %}
         <li>
             <a href="/add_item">
-                <button type="button" class="btn btn-outline-success" style="margin-bottom: 20px;margin-right: 24px;margin-top: 30px;">
+                <button type="button" class="btn btn-success" style="margin-bottom: 20px;margin-right: 24px;margin-top: 30px;">
                     Выставить аккаунт на продажу
                 </button>
             </a>
@@ -53,7 +53,7 @@
             <p style="text-align: center; color: white;">{{item}} <i class="fa fa-globe" aria-hidden="true"
                                               style="color:#7FFFD4"></i></p>
         {% endif %}
-        <a target="_blank" style='float: right;' href={{item_list[item][2]}} class="btn btn-outline-primary">Написать продавцу</a></nobr>
+        <a target="_blank" style='float: right;' href={{item_list[item][2]}} class="btn btn-primary">Написать продавцу</a></nobr>
         <p style=' color: white;'>{{item_list[item][0]}} ₽; Количество - {{item_list[item][1]}} <br> Продавец - {{item_list[item][3]}}</p>
     </div>
     {% if current_user.is_authenticated and (current_user.root == 1 or item_list[item][6] == current_user.nickname) %}

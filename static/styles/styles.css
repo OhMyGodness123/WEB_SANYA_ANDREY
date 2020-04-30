@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    background-color: #131d63;
+    background-color: #7f8ce9;
     font-family: 'Open Sans', sans-serif;
     font-weight: 80px;
 }
@@ -12,9 +12,7 @@ body {
 
 .logo {
     float: left;
-    height: 70px;
-    padding-top: 30px;
-    padding-left: 60px;
+    height: 50px;
 }
 
 header {
@@ -24,28 +22,6 @@ header {
     height: 90px
 }
 
-nav {
-        float: right;
-}
-
-nav ul {
-    margin: 0;
-    list-style: none;
-    padding-right: 140px;
-}
-
-nav li {
-    display: inline-block;
-    margin-left: 80px;
-
-}
-
-nav a {
-    color: #05f;
-    text-decoration: none;
-    font-size: 25px;
-    font-weight: bold
-}
 
 .market {
     color: #05f;
@@ -57,20 +33,21 @@ nav a {
 
 
 .themes {
-    background: #000000;
+    background: #271c1a8c;
     float: left;
     font-size: 19px;
     width: 15%;
     height: 350px;
-    margin-left: 10%;
+    margin-left: 7%;
     margin-top: 40px;
     border-radius: 14px;
     padding-left: 10px;
     padding-top: 60px;
+    color: #00ff99d1;
 }
 
 .contentss {
-    background: #000000;
+    background: #271c1a8c;
     font-size: 19px;
     width: 68%;
     margin-left: 22%;
@@ -83,7 +60,7 @@ nav a {
 }
 
 .rainbowborder {
-   background-color: #0b0810;
+   background-color:#1e192780;
   border: 3px solid transparent;
   border-image: linear-gradient(to bottom right, #b827fc 0%, #2c90fc 25%, #b8fd33 50%, #fec837 75%, #fd1892 100%);
   border-image-slice: 1;
@@ -92,7 +69,7 @@ nav a {
 }
 
 .discus {
-    background: #000000;
+    background: #271c1a8c;
     font-size: 19px;
     width: 70%;
     margin-left: 280px;
@@ -105,7 +82,7 @@ nav a {
 }
 
 .sale {
-    background: #000000;
+    background: #271c1a8c;
     font-size: 19px;
     width: 68%;
     margin-left: 16%;
@@ -127,14 +104,15 @@ nav a {
   width: 70%;
   padding-top: 10px;
   padding-bottom: 50px;
-  background-color: black;
-  margin-left: 17%;
+  background-color: #271c1a8c;
+  margin-left: 20%;
   border-radius: 7px;
   margin-top: 20px;
   padding-left: 5%;
 }
 
 .border-gradient-green {
+   background-color:#1e192780;
   border: solid;
   border-image-slice: 1;
   color: white;
@@ -152,9 +130,9 @@ nav a {
   width: 14%;
   padding-top: 10px;
   padding-bottom: 50px;
-  background-color: black;
+  background-color: #271c1a8c;
   color: white;
-  margin-left: 4%;
+  margin-left: 6%;
   list-style: none;
   border-radius: 7px;
   margin-top: 20px;

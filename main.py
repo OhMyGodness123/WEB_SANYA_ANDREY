@@ -17,6 +17,7 @@ from flask_ngrok import run_with_ngrok
 
 
 app = Flask(__name__)  # создание приложения
+run_with_ngrok(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # создание ключа
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -38,19 +39,19 @@ def not_found(error):
 
 class RegisterForm(FlaskForm):  # класс формы регистрации
     email = StringField('Почта', [validators.Email()])
-    password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
-    password_again = PasswordField('Повторите пароль', [validators.Length(min=5, max=30)])
-    name = StringField('Имя пользователя', [validators.Length(min=5, max=30)])
+    password = PasswordField('Пароль')
+    password_again = PasswordField('Повторите пароль')
+    name = StringField('Имя пользователя')
     submit = SubmitField('Зарегистрироваться')
 
 
 class SaleForm(FlaskForm):  # класс формы продажи аккаунтов
-    name = StringField('Название товара:', [validators.Length(min=5, max=80)])
+    name = StringField('Название товара:')
     category = SelectField('Категория:',
                            choices=[('ВК', 'ВК'), ('Telegram', 'Telegram'), ('Steam', 'Steam'),
                                     ('Instagram', 'Instagram'), ('Другое', 'Другое')])
-    contact_info = StringField('Ссылка на страницу Вконтакте:', [validators.Length(min=15, max=50)])
-    price = StringField('Цена товара:', [validators.Length(min=1, max=30)])
+    contact_info = StringField('Ссылка на страницу Вконтакте:')
+    price = StringField('Цена товара:')
     count = SelectField('Количество товара:',
                         choices=[('1', '1'), ('2', '2'), ('3', '3'),
                                  ('4', '4'), ('5', '5'),
@@ -59,20 +60,20 @@ class SaleForm(FlaskForm):  # класс формы продажи аккаун�
 
 
 class LoginForm(FlaskForm):  # класс формы авторизации
-    email = StringField('Почта', [validators.Email()])
-    password = PasswordField('Пароль', [validators.Length(min=5, max=30)])
+    email = StringField('Почта')
+    password = PasswordField('Пароль')
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 
 class ForumForm(FlaskForm):  # класс формы обсуждения
-    message = TextAreaField('Введите своё сообщение:', [validators.Length(min=4)])
+    message = TextAreaField('Введите своё сообщение:')
     submit = SubmitField('Отправить')
 
 
 class NewsForm(FlaskForm):  # класс формы создания новости
-    title = StringField('Заголовок:', [validators.Length(min=4, max=166)])
-    text = TextAreaField('Содержание:', [validators.Length(min=2)])
+    title = StringField('Заголовок:')
+    text = TextAreaField('Содержание:')
     color = StringField('Цвет новости: #')
     category = SelectField('Категория',
                            choices=[('Новости', 'Новости'), ('Софт', 'Софт'), ('Халява', 'Халява'),
@@ -100,8 +101,22 @@ def logout():
 def add_news():
     form = NewsForm()
     if form.validate_on_submit():
+
         sessions = db_session.create_session()
         new = news.News()
+        if len(form.title.data) <= 5:  # проверка длины заголовка
+            return render_template('add_news.html', form=form,
+                                   nickname=current_user.nickname, image=current_user.avatar,
+                                   title='Редактирование', message='Пожалуйста,'
+                                                                   ' сформулируйте заголовок'
+                                                                   ' темы более подробно')
+        if len(form.text.data) <= 15:  # проверка длины текста темы
+            return render_template('add_news.html', form=form,
+                                   nickname=current_user.nickname, image=current_user.avatar,
+                                   title='Редактирование', message='Пожалуйста,'
+                                                                   ' сформулируйте ваш'
+                                                                   ' текст более подробно'
+                                                                   ' (Более 15 знаков)')
         new.title = form.title.data
         text2 = form.text.data
 
@@ -169,7 +184,22 @@ def edit_news(id):
         comment = sessions.query(comments.Comments).filter(comments.Comments.for_topic == id,
                                                            comments.Comments.first_com ==
                                                            'Y').first()
-        if new:
+        # нахождение первого комментария для его изменения
+
+        if new:  # если новость сформулированна
+            if len(form.title.data) <= 5:  # проверка длины заголовка
+                return render_template('add_news.html', form=form,
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       title='Редактирование', message='Пожалуйста,'
+                                                                       ' сформулируйте заголовок'
+                                                                       ' темы более подробно')
+            if len(form.text.data) <= 15:  # проверка длины текста темы
+                return render_template('add_news.html', form=form,
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       title='Редактирование', message='Пожалуйста,'
+                                                                       ' сформулируйте ваш'
+                                                                       ' текст более подробно'
+                                                                       ' (Более 15 знаков)')
             new.title = form.title.data
             new.text = form.text.data
             comment.text = form.text.data
@@ -194,9 +224,14 @@ def login():
         if user and user.check_password(form.password.data):  # проверка на пароль
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        return render_template('login.html',
-                               message="Неправильный логин или пароль",
-                               form=form)
+        elif user:  # проверка существует ли вообще этот пользователь
+            return render_template('login.html',
+                                   message="Неправильный логин или пароль",
+                                   form=form)
+        else:
+            return render_template('login.html',
+                                   message="Такого пользователя не существует",
+                                   form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 
@@ -218,11 +253,24 @@ def reqister():
                                    message="Пароли не совпадают")
         session = db_session.create_session()
         if session.query(users.User).filter(
-                users.User.email == form.email.data).first() or session.query(users.User).filter(
-            users.User.nickname == form.name.data).first():  # если такие никнейм занят
+                users.User.nickname == form.name.data).first():  # если такой никнейм занят
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
+        if session.query(users.User).filter(
+                users.User.email == form.email.data).first():  # если такая почта занята
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="На данную почту уже зарегистирован аккаунт")
+        if len(form.password.data) <= 5:  # проверка на длину пароля
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Вы ввели слишком простой пароль. \n\n\n"
+                                           "Длина хорошего пароля больше 5 символов")
+        if len(form.name.data) <= 3:  # проверка на длину логина
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Вы ввели слишком короткое имя пользователя")
         user = users.User(
             nickname=form.name.data,
             email=form.email.data,
@@ -251,21 +299,30 @@ def index():
 def discussion(news_id):
     forum = ForumForm()  # форма для оставления комментариев
     session = db_session.create_session()
+    dict_com = []  # список словарей нужен для передачи комментариев в html
+    for comment in session.query(comments.Comments).filter(
+            comments.Comments.for_topic == news_id).all():
+        dict_com.append(
+            {'text': bbcodepy.Parser().to_html(comment.text), 'author': comment.nickname})
     new = session.query(news.News).filter(news.News.id == news_id).first()
     messages = forum.message.data
     if forum.validate_on_submit():
         comment = comments.Comments()
+        if len(messages) <= 4:  # проверяем длину комментария
+            return render_template('discussion.html', nickname=current_user.nickname,
+                                   image=current_user.avatar, messages=dict_com, form=forum,
+                                   title=new.title, category=new.category,
+                                   message='Сформулируйте, свой комментарий более подробно')
         comment.text = messages
         comment.nickname = current_user.nickname
         comment.for_topic = new.id
         comment.first_com = 'N'
         session.add(comment)
         session.commit()
-    dict_com = []  # список словарей нужен для передачи комментариев в html
-    for comment in session.query(comments.Comments).filter(
-            comments.Comments.for_topic == news_id).all():
         dict_com.append(
             {'text': bbcodepy.Parser().to_html(comment.text), 'author': comment.nickname})
+        # добавляем новый комментарий
+
     if current_user.is_authenticated:
         return render_template('discussion.html', nickname=current_user.nickname,
                                image=current_user.avatar, messages=dict_com, form=forum,
@@ -305,30 +362,42 @@ def my_profile():
            methods=['GET', 'POST'])  # настройки пользователя для смены почты или пароля
 def settings():
     form = SettingsForm()
+    form.email.data = current_user.email
     if form.validate_on_submit():
         session = db_session.create_session()
         user = session.query(users.User).filter(users.User.id == current_user.id).first()
         if user.check_password(form.old_pass.data):  # проверка чтобы старый пароль совпадал
-            if form.new_pass.data == form.new_pass_again.data and form.new_pass.data != '':
+            if form.new_pass.data == form.new_pass_again.data and form.new_pass_again.data != '':
                 # проверка чтобы новые пароли совпадали
-                if user:
-                    user.set_password(form.new_pass.data)  # меняем пароль
-                    session.commit()
-                    return redirect('/')
+                if len(form.new_pass_again.data) >= 5:
+                    if user:
+                        user.set_password(form.new_pass.data)  # меняем пароль
+                        session.commit()
+                        return redirect('/')
+                    else:
+                        abort(404)
                 else:
-                    abort(404)
+                    return render_template('settings.html',
+                                           nickname=current_user.nickname,
+                                           image=current_user.avatar,
+                                           form=form, message='Вы ввели слишком простой пароль. '
+                                                              'Длина хорошего пароля '
+                                                              'больше 5 символов')
             elif current_user.email != form.email.data:  # если старая почта была изменена
                 user.email = form.email.data
                 session.commit()
                 return redirect('/')
-            else:  # если новые пароли не совпали
+            elif form.new_pass_again.data != '' or form.new_pass.data != '':
+                # если новые пароли не совпали
                 return render_template('settings.html',
                                        nickname=current_user.nickname, image=current_user.avatar,
-                                       form=form, message='Пароли не совпадают')
+                                       form=form, message='Новые пароли не совпадают')
         else:  # если старый пароль не совпадает
             return render_template('settings.html',
                                    nickname=current_user.nickname, image=current_user.avatar,
-                                   form=form, message='Неверный пароль')
+                                   form=form, message='Для подтверждения действий нужно ввести'
+                                                      ' старый пароль. У вас введён'
+                                                      ' неверный пароль.')
     return render_template('settings.html', title='Todoroki | Настройки',
                            nickname=current_user.nickname, image=current_user.avatar, form=form)
 
@@ -339,17 +408,27 @@ def add_item():
     form = SaleForm()
     if form.validate_on_submit():
         session = db_session.create_session()
-        acc = accounts.Accounts()
-        acc.title = form.name.data
-        acc.count = form.count.data
-        acc.type = form.category.data
-        acc.price = form.price.data
-        acc.user_name = current_user.nickname
-        try:  # попытка изменения ссылки
-            acc.vk_silka = vk_changed_ssilka(form.contact_info.data)
-        except TypeError:  # если введенная ссылка неправильная
-            return render_template('add_item.html', form=form, message='Неверная ссылка!')
-        session.add(acc)
+        item = accounts.Accounts()
+        if len(form.name.data) <= 5:    # проверка короткого названия
+            return render_template('add_item.html', form=form,
+                                   nickname=current_user.nickname, image=current_user.avatar,
+                                   message='Название товара должно быть больше 5 символов')
+        item.title = form.name.data
+        item.type = form.category.data
+        new_ssilka = vk_changed_ssilka(form.contact_info.data)
+        if len(form.contact_info.data) < 15 or new_ssilka == 'error':  # проверка ссылки вк
+            return render_template('add_item.html', form=form,
+                                   nickname=current_user.nickname, image=current_user.avatar,
+                                   message='Введите корректную ссылку ВК. Без сокращений')
+        item.vk_silka = new_ssilka
+        item.price = form.price.data
+        if len(form.price.data) > 8:  # проверка чтобы цена не была слишком большой
+            return render_template('add_item.html', form=form,
+                                   nickname=current_user.nickname, image=current_user.avatar,
+                                   message='Слишком большая цена для аккаунта.')
+        item.count = form.count.data
+        item.user_name = current_user.nickname
+        session.add(item)
         session.commit()
         items = session.query(accounts.Accounts).all()
         item_list = {}  # словарь для товаров
@@ -416,10 +495,22 @@ def edit_item(id):
         sessions = db_session.create_session()
         item = sessions.query(accounts.Accounts).filter(accounts.Accounts.id == id).first()
         if item:
+            if len(form.name.data) <= 5:
+                return render_template('add_item.html', form=form,
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       message='Название товара должно быть больше 5 символов')
             item.title = form.name.data
             item.type = form.category.data
             item.vk_silka = vk_changed_ssilka(form.contact_info.data)
+            if len(form.contact_info.data) < 15:
+                return render_template('add_item.html', form=form,
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       message='Введите корректную ссылку ВК. Без сокращений')
             item.price = form.price.data
+            if len(form.price.data) > 8:
+                return render_template('add_item.html', form=form,
+                                       nickname=current_user.nickname, image=current_user.avatar,
+                                       message='Слишком большая цена для аккаунта.')
             item.count = form.count.data
             sessions.commit()
             return redirect('/market')

@@ -7,7 +7,7 @@ from sqlalchemy_serializer import SerializerMixin
 import datetime
 
 
-class User(SqlAlchemyBase, UserMixin, SerializerMixin):
+class User(SqlAlchemyBase, UserMixin, SerializerMixin):  # класс пользователей
     __tablename__ = 'users'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True)
     nickname = sqlalchemy.Column(sqlalchemy.String, unique=True)

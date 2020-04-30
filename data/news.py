@@ -6,7 +6,7 @@ from sqlalchemy_serializer import SerializerMixin
 import datetime
 
 
-class News(SqlAlchemyBase, UserMixin, SerializerMixin):
+class News(SqlAlchemyBase, UserMixin, SerializerMixin):  # класс тем
     __tablename__ = 'news'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True)
     color = sqlalchemy.Column(sqlalchemy.String)
