@@ -44,7 +44,10 @@
                           </button>
                           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" href="/profile">Мой профиль</a>
-                            <a class="dropdown-item" href="/settings">Насторойки</a>
+                            <a class="dropdown-item" href="/settings">Настройки</a>
+                              {% if current_user.root == 1 %}
+                              <a class="dropdown-item" href="/reviews">Отзывы<a>
+                              {% endif %}
                             <a class="dropdown-item" href="/logout">Выход</a>
                           </div>
                         </div></li>

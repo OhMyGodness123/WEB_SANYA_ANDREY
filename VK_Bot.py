@@ -50,36 +50,54 @@ def main():
                                  random_id=random.randint(0, 2 ** 64))
             else:
                 if message == 'Пожалуйста опишите что вам не понравилось':
-                    message = 'Спасибо за ваш жалобу! Мы постараемся все исправить'
-                    vk.messages.send(user_id=event.obj.message['from_id'],
-                                     message=message,
-                                     random_id=random.randint(0, 2 ** 64),
-                                     keyboard=str(json.dumps(keyboard)))
-                    sessions = db_session.create_session()
-                    com = complaint_book.Book()
-                    com.vk_id = event.obj.message['from_id']
-                    com.comment_text = event.obj.message['text']
-                    com.type_of_message = 'complaints'
-                    sessions.add(com)
-                    sessions.commit()
-                    message = 'Напишите команду "!Пожаловаться", чтобы пожаловаться\n команду' \
-                              ' "!Отзыв", чтобы оствить отзыв'
+                    if event.obj.message['text'] != '':
+                        message = 'Спасибо за ваш жалобу! Мы постараемся все исправить.'
+                        vk.messages.send(user_id=event.obj.message['from_id'],
+                                         message=message,
+                                         random_id=random.randint(0, 2 ** 64),
+                                         keyboard=str(json.dumps(keyboard)))
+                        sessions = db_session.create_session()
+                        com = complaint_book.Book()
+                        com.vk_id = event.obj.message['from_id']
+                        com.comment_text = event.obj.message['text']
+                        com.type_of_message = 'Жалоба'
+                        sessions.add(com)
+                        sessions.commit()
+                        message = 'Напишите команду "!Пожаловаться", чтобы пожаловаться\n команду' \
+                                  ' "!Отзыв", чтобы оствить отзыв'
+                    else:
+                        message = 'Повторите операцию пожайлуста! \n' \
+                                  ' Мы не можем принять стикер или голосовое сообщение.' \
+                                  ' Приносим свои извенения!'
+                        vk.messages.send(user_id=event.obj.message['from_id'],
+                                         message=message,
+                                         random_id=random.randint(0, 2 ** 64),
+                                         keyboard=str(json.dumps(keyboard)))
 
                 elif message == 'Пожалуйста оставьте отзыв':
-                    message = 'Спасибо за ваш отзыв!'
-                    vk.messages.send(user_id=event.obj.message['from_id'],
-                                     message=message,
-                                     random_id=random.randint(0, 2 ** 64),
-                                     keyboard=str(json.dumps(keyboard)))
-                    sessions = db_session.create_session()
-                    com = complaint_book.Book()
-                    com.vk_id = event.obj.message['from_id']
-                    com.comment_text = event.obj.message['text']
-                    com.type_of_message = 'review'
-                    sessions.add(com)
-                    sessions.commit()
-                    message = 'Напишите команду "!Пожаловаться", чтобы пожаловаться\n команду ' \
-                              '"!Отзыв", чтобы оствить отзыв'
+                    if event.obj.message['text'] != '':
+                        message = 'Спасибо за ваш отзыв!'
+                        vk.messages.send(user_id=event.obj.message['from_id'],
+                                         message=message,
+                                         random_id=random.randint(0, 2 ** 64),
+                                         keyboard=str(json.dumps(keyboard)))
+                        sessions = db_session.create_session()
+                        com = complaint_book.Book()
+                        com.vk_id = event.obj.message['from_id']
+                        com.comment_text = event.obj.message['text']
+                        com.type_of_message = 'Отзыв'
+                        sessions.add(com)
+                        sessions.commit()
+                        message = 'Напишите команду "!Пожаловаться", чтобы пожаловаться\n команду' \
+                                  ' "!Отзыв", чтобы оствить отзыв'
+                    else:
+                        message = 'Повторите операцию пожайлуста! \n' \
+                                  ' Мы не можем принять стикер или голосовое сообщение.' \
+                                  ' Приносим свои извенения!'
+                        vk.messages.send(user_id=event.obj.message['from_id'],
+                                         message=message,
+                                         random_id=random.randint(0, 2 ** 64),
+                                         keyboard=str(json.dumps(keyboard)))
                 else:
                     vk.messages.send(user_id=event.obj.message['from_id'],
                                      message=message,

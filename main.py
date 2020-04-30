@@ -5,7 +5,7 @@ from wtforms import StringField, PasswordField, SubmitField, TextAreaField, Bool
     SelectField
 from wtforms import validators
 from vk_user_id import vk_changed_ssilka, old_ssika
-from data import db_session, news, users, accounts, comments
+from data import db_session, news, users, accounts, comments, complaint_book
 import random
 import requests
 from flask_restful import abort, Api
@@ -17,7 +17,6 @@ from flask_ngrok import run_with_ngrok
 
 
 app = Flask(__name__)  # создание приложения
-run_with_ngrok(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # создание ключа
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -82,9 +81,9 @@ class NewsForm(FlaskForm):  # класс формы создания новос�
 
 
 class SettingsForm(FlaskForm):  # класс формы настроек
-    email = StringField('Почта')
+    email = StringField('Почта', [validators.Email()])
     old_pass = PasswordField('Старый пароль')
-    new_pass = PasswordField('Новый пароль', [validators.Length(min=5, max=155)])
+    new_pass = PasswordField('Новый пароль')
     new_pass_again = PasswordField('Подтвердите новый пароль')
     submit = SubmitField('Сохранить')
 
@@ -468,7 +467,20 @@ def about():
     return render_template('about.html', filename=map_file)
 
 
-db_session.global_init("db/blogs.sqlite")  # иницилизация БД
-api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
-api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
-app.run()  # запуск приложения
+@app.route('/reviews')
+def review():
+    session = db_session.create_session()
+    reviews = session.query(complaint_book.Book).all()
+    return render_template('reviews.html', reviews=reviews, nickname=current_user.nickname,
+                           image=current_user.avatar)
+
+
+def main():
+    db_session.global_init("db/blogs.sqlite")  # иницилизация БД
+    api.add_resource(Api_news.NewsListResource, '/api/v1/news')  # иницилизация API
+    api.add_resource(Api_news.NewsResource, '/api/v1/news/<int:news_id>')
+    app.run(port=12, host='127.0.0.1')
+
+
+if __name__ == '__main__':
+    main()
