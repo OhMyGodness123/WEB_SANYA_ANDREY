@@ -11,6 +11,7 @@ SQLAlchemy==1.3.13
 Werkzeug==1.0.0
 WTForms==2.2.1
 vk
+vk_api
 SQLAlchemy-serializer
 bbcodepy
 sqlalchemy_serializer
