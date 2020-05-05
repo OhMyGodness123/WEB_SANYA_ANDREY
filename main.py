@@ -87,6 +87,13 @@ class SettingsForm(FlaskForm):  # класс формы настроек
     submit = SubmitField('Сохранить')
 
 
+def change_vk_url(url):
+    try:
+        return f"https://vk.me/{url.split('/')[-1]}"
+    except Exception:
+        return 'error'
+
+
 @app.route('/logout')  # выход пользователя из системы
 @login_required
 def logout():
@@ -407,13 +414,13 @@ def add_item():
     if form.validate_on_submit():
         session = db_session.create_session()
         item = accounts.Accounts()
-        if len(form.name.data) <= 5:    # проверка короткого названия
+        if len(form.name.data) <= 5:  # проверка короткого названия
             return render_template('add_item.html', form=form,
                                    nickname=current_user.nickname, image=current_user.avatar,
                                    message='Название товара должно быть больше 5 символов')
         item.title = form.name.data
         item.type = form.category.data
-        new_ssilka = vk_changed_ssilka(form.contact_info.data)
+        new_ssilka = change_vk_url(form.contact_info.data)
         if len(form.contact_info.data) < 15 or new_ssilka == 'error':  # проверка ссылки вк
             return render_template('add_item.html', form=form,
                                    nickname=current_user.nickname, image=current_user.avatar,
