@@ -503,7 +503,7 @@ def edit_item(id):
             item.title = form.name.data
             item.type = form.category.data
             item.vk_silka = f"{change_vk_url(form.contact_info.data)}" \
-                            f" {item.vk_silka.split()[1]}"
+                            f" {form.contact_info.data}"
             if len(form.contact_info.data) < 15:
                 return render_template('add_item.html', form=form,
                                        nickname=current_user.nickname, image=current_user.avatar,
