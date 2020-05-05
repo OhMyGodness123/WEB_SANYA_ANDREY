@@ -413,7 +413,7 @@ def add_item():
     if form.validate_on_submit():
         session = db_session.create_session()
         item = accounts.Accounts()
-        if len(form.name.data) <= 5:  # проверка короткого названия
+        if len(form.name.data) <= 5:    # проверка короткого названия
             return render_template('add_item.html', form=form,
                                    nickname=current_user.nickname, image=current_user.avatar,
                                    message='Название товара должно быть больше 5 символов')
@@ -424,7 +424,7 @@ def add_item():
             return render_template('add_item.html', form=form,
                                    nickname=current_user.nickname, image=current_user.avatar,
                                    message='Введите корректную ссылку ВК. Без сокращений')
-        item.vk_silka = new_ssilka
+        item.vk_silka = f"{new_ssilka} {form.contact_info.data}"
         item.price = form.price.data
         if len(form.price.data) > 8:  # проверка чтобы цена не была слишком большой
             return render_template('add_item.html', form=form,
@@ -444,12 +444,9 @@ def add_item():
                                    nickname=current_user.nickname,
                                    image=current_user.avatar, item_list=item_list)
         return render_template('market.html', item_list=item_list)
-
-    if current_user.is_authenticated:
-        return render_template('add_item.html',
-                               nickname=current_user.nickname,
-                               image=current_user.avatar, form=form)
-    return render_template('add_item.html', form=form)
+    return render_template('add_item.html',
+                           nickname=current_user.nickname,
+                           image=current_user.avatar, form=form)
 
 
 @app.route('/market', methods=['POST', 'GET'])  # страница маркета
@@ -490,7 +487,7 @@ def edit_item(id):
         if item:  # проверка на существование аккаунта
             form.name.data = item.title
             form.category.data = item.type
-            form.contact_info.data = old_ssika(item.vk_silka)
+            form.contact_info.data = item.vk_silka.split()[1]
             form.price.data = item.price
             form.count.data = item.count
         else:  # если такого аккаунта нет, то выбрасываем ошибку 404
@@ -505,7 +502,8 @@ def edit_item(id):
                                        message='Название товара должно быть больше 5 символов')
             item.title = form.name.data
             item.type = form.category.data
-            item.vk_silka = vk_changed_ssilka(form.contact_info.data)
+            item.vk_silka = f"{change_vk_url(form.contact_info.data)}" \
+                            f" {item.vk_silka.split()[1]}"
             if len(form.contact_info.data) < 15:
                 return render_template('add_item.html', form=form,
                                        nickname=current_user.nickname, image=current_user.avatar,

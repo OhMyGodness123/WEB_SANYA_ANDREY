@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<table border="1" style="margin-left: 35%; color: white; border-color: white; width: 25%; align: left; margin-top: 2%; margin-bottom: 2%; font-size: 25px" cellpadding="2">
+<table border="1" style="color: white; border-color: white; align: left; margin-top: 2%; margin-bottom: 2%; font-size: 25px;width: 100%" cellpadding="2">
    <tr style="background-color: #6043e8; text-align: center;">
     <th>id</th>
     <th>тип</th>
     <th>vk id</th>
-    <th>сообшение</th>
+    <th>сообщение</th>
    </tr>
    {% for item in reviews %}
     {% if item.type_of_message == 'review' %}
-        <tr style="background-color: #6043e8;;"><td style="text-align: center;">{{ item.id }}</td><td>{{ item.type_of_message}}</td><td>{{ item.vk_id }}</td><td style="word-break: break-all;">{{ item.comment_text }}</td></tr>
+        <tr style="background-color: #6043e8;;"><td style="text-align: center;">{{ item.id }}</td><td>Отзыв</td><td>https://vk.com/id{{ item.vk_id }}</td><td style="word-break: break-all;">{{ item.comment_text }}</td></tr>
     {% else %}
-        <tr style="background-color: #6043e8;;"><td style="text-align: center;">{{ item.id }}</td><td>{{ item.type_of_message}}</td><td>{{ item.vk_id }}</td><td style="word-break: break-all;">{{ item.comment_text }}</td></tr>
+        <tr style="background-color: #6043e8;;"><td style="text-align: center;">{{ item.id }}</td><td>Жалоба</td><td>https://vk.com/id{{ item.vk_id }}</td><td style="word-break: break-all;">{{ item.comment_text }}</td></tr>
     {% endif %}
 {% endfor %}
   </table>

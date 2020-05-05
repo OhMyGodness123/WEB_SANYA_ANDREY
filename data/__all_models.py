@@ -1,1 +1,1 @@
-from . import users, news, accounts
+from . import users, news, accounts, complaint_book, comments
