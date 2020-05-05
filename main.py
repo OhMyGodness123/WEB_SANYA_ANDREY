@@ -4,7 +4,6 @@ from flask_login import LoginManager, login_user, logout_user, current_user, log
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField, \
     SelectField
 from wtforms import validators
-from vk_user_id import vk_changed_ssilka, old_ssika
 from data import db_session, news, users, accounts, comments, complaint_book
 import random
 import requests
